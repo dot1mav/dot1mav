@@ -1,9 +1,9 @@
 # dot1mav
 
-love python and linux
-have be fun
+>love python and linux
+Have Be Fun
 
-'''python
+```python
 def always():
   return f'be perfect'
-'''
+```

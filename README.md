@@ -1,7 +1,8 @@
 # dot1mav
 
 >love python and linux
-Have Be Fun
+>add more bug to fix later
+>always be perfect like c
 
 ```python
 def always():

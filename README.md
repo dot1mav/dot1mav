@@ -9,6 +9,5 @@ def always():
   return f'be perfect'
 ```
 
-![Anurag's github stats](https://github-readme-stats.vercel.app/api?username=dot1mav&show_icons=true)
-![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=dot1mav&layout=pie)
-[![Harlok's wakatime stats](https://github-readme-stats.vercel.app/api/wakatime?username=dot1mav)]
+![Anurag's github stats](https://github-readme-stats.vercel.app/api?username=dot1mav&show_icons=true&theme=gruvbox)
+![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=dot1mav&layout=donut&theme=gruvbox)

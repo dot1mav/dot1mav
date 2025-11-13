@@ -1,0 +1,205 @@
+{
+    "projects": [
+        {
+            "title": "Industrial Automation System",
+            "tech_stack": "PLC Siemens, OPC UA, Python, Flask, Excel",
+            "description": "Designed and implemented production management systems integrating with PLC for automation, improving efficiency by 30%.",
+            "demo_link": null
+        },
+        {
+            "title": "Baloch Publications Website",
+            "tech_stack": "WordPress, Elementor",
+            "description": "Developed a publishing website using WordPress and Elementor for efficient content management, handling over 1000 daily visitors.",
+            "demo_link": null
+        },
+        {
+            "title": "Production Automation Portal",
+            "tech_stack": "Django, MariaDB, ORM, Query Optimization",
+            "description": "Built a custom organizational portal with Django for managing forms, production and disassembly workflows. Integrated with template-based frontend and Grafana for dynamic reporting, reducing processing time by 25%.",
+            "demo_link": null
+        },
+        {
+            "title": "Vas Marketplace",
+            "tech_stack": "WordPress",
+            "description": "Created an online marketplace platform using WordPress, facilitating secure transactions and user management.",
+            "demo_link": "https://vas-market.com"
+        },
+        {
+            "title": "Mardomnegar Publishing Website",
+            "tech_stack": "WordPress, Elementor, PHP",
+            "description": "Developed a publishing site with custom PHP enhancements, improving load times and user engagement.",
+            "demo_link": "https://mardomnegar.info"
+        },
+        {
+            "title": "Meter Logging System",
+            "tech_stack": "HMI, PLC Delta, Python, MQTT Broker, Flask",
+            "description": "Implemented a real-time logging system for meters using HMI and PLC integration with MQTT and Flask backend, ensuring 99.9% uptime.",
+            "demo_link": null
+        },
+        {
+            "title": "Debt Collection System",
+            "tech_stack": "Flask, Nuxt.js, Cronjob",
+            "description": "Developed a system for managing debt collection with automated scheduled tasks via Cronjob, streamlining operations.",
+            "demo_link": null
+        },
+        {
+            "title": "UseFul Utility Scripts",
+            "tech_stack": "Python",
+            "description": "Collection of useful Python scripts for automation tasks, used in various projects to enhance productivity.",
+            "demo_link": "https://github.com/dot1mav/UseFul"
+        },
+        {
+            "title": "OwnFirewall",
+            "tech_stack": "iptables, Python, Shell",
+            "description": "Custom firewall implementation using iptables and Python scripting to enhance Linux security.",
+            "demo_link": "https://github.com/dot1mav/OwnFirewall"
+        },
+        {
+            "title": "Shared Space Management Software",
+            "tech_stack": "Django, Bootstrap, jQuery",
+            "description": "Software for managing shared workspaces with intuitive user interfaces built on Bootstrap and jQuery.",
+            "demo_link": null
+        },
+        {
+            "title": "Ticket Purchase Software",
+            "tech_stack": "Electron.js, Vue.js, Python, Requests, API, POS",
+            "description": "Desktop application for ticket purchasing integrating APIs and POS systems, handling high-volume transactions.",
+            "demo_link": null
+        },
+        {
+            "title": "Insurance Management Panel",
+            "tech_stack": "Tkinter, pandas, Flask, Bootstrap, Kavenegar API",
+            "description": "Management panel for insurance data using Tkinter GUI and Flask backend, integrated with Kavenegar SMS API for notifications.",
+            "demo_link": null
+        },
+        {
+            "title": "IOT Cooling System Control",
+            "tech_stack": "Python, Flask, SQLAlchemy",
+            "description": "IoT system for controlling cooling devices with Flask and database management, optimizing energy usage by 20%.",
+            "demo_link": null
+        },
+        {
+            "title": "Custom Message Broker",
+            "tech_stack": "Python, Threading",
+            "description": "Designed and implemented a custom Message Broker using Python for concurrent processing, deployed on Linux servers, reducing latency by 40%.",
+            "demo_link": null
+        },
+        {
+            "title": "Web Scraping for Customer Analysis",
+            "tech_stack": "Python",
+            "description": "Performed web scraping to extract data for digital marketing and customer behavior analysis, providing actionable insights.",
+            "demo_link": null
+        },
+        {
+            "title": "BI Dashboards with Grafana",
+            "tech_stack": "Grafana, CRM Integration",
+            "description": "Implemented BI dashboards for sales and CRM using Grafana connected to internal data sources, improving decision-making speed.",
+            "demo_link": null
+        },
+        {
+            "title": "DOH Proxy",
+            "tech_stack": "JavaScript",
+            "description": "Developed a DNS over HTTPS proxy for secure and private DNS queries.",
+            "demo_link": "https://github.com/dot1mav/doh-proxy"
+        },
+        {
+            "title": "Flask Blueprints Auto Importer",
+            "tech_stack": "Python, Flask",
+            "description": "Gist for automatically importing Flask blueprints to simplify app structure.",
+            "demo_link": "https://gist.github.com/dot1mav/03efe7afcbda405fd954553516b2499f"
+        },
+        {
+            "title": "Custom Python Thread",
+            "tech_stack": "Python, Threading",
+            "description": "Custom thread implementation using Python's threading module and abstract base classes.",
+            "demo_link": "https://gist.github.com/dot1mav/11eab0c4f81045ca158f52c6dab8227e"
+        },
+        {
+            "title": "Sync Variable in Threading",
+            "tech_stack": "Python, Threading",
+            "description": "Utility for synchronizing variables in multi-threaded environments using Lock and Event.",
+            "demo_link": "https://gist.github.com/dot1mav/87f3b5796061239b828b2342aff746df"
+        }
+    ],
+    "experiences": [
+        {
+            "title": "IT Expert",
+            "company": "Nab Entrepreneurship Club",
+            "location": "Bandar Abbas, Hormozgan",
+            "dates": "July 2024 - December 2025",
+            "duties": [
+                "Reviewed, designed, and deployed new organizational networks and integrated multi-entity infrastructures.",
+                "Configured and managed MikroTik routers including Routing, VPN, Firewall, and monitoring.",
+                "Developed Python scripts and tools for task automation and data processing.",
+                "Performed Web Scraping to extract data for digital marketing and customer behavior analysis.",
+                "Implemented BI dashboards for sales and CRM using Grafana connected to internal data sources.",
+                "Developed custom organizational portal with Django for managing forms, production and disassembly workflows, with template-based frontend and multiple internal applications.",
+                "Integrated portal's reporting module with Grafana for dynamic analytical reports.",
+                "Managed and supported MariaDB and PostgreSQL databases, including design, optimization, and maintenance.",
+                "Provided consulting on software purchases and selecting solutions aligned with organizational needs.",
+                "Performed backups, monitoring, and network troubleshooting to maintain service stability."
+            ]
+        },
+        {
+            "title": "IT Expert",
+            "company": "Laziz",
+            "location": "Bandar Abbas, Hormozgan",
+            "dates": "June 2023 - September 2023",
+            "duties": [
+                "Continuously monitored system health and stability, resolving software and hardware issues.",
+                "Provided consulting on selecting, purchasing, and deploying organizational software based on operational needs.",
+                "Managed and maintained internal organizational applications, including configuration, updates, and debugging.",
+                "Analyzed and evaluated proposed software for purchase, assessing features and alignment with organizational processes.",
+                "Participated in troubleshooting IT systems and improving efficiency and service stability."
+            ]
+        },
+        {
+            "title": "Server Programmer",
+            "company": "Hormoz IoT Innovative Engineers Company",
+            "location": "Bandar Abbas, Hormozgan",
+            "dates": "November 2020 - Present",
+            "duties": [
+                "Developed web services using Flask, including API design, Session management, and modular structures.",
+                "Managed Ubuntu servers, including deployment, security settings, monitoring, and system updates.",
+                "Managed existing organizational services, optimized them, and added new services based on operational needs.",
+                "Designed and implemented a custom Message Broker with Python using Thread Handling for concurrent processing to improve efficiency and system stability.",
+                "Deployed and executed Message Broker on Linux servers and upgraded it for stable performance in Elite Foundation projects.",
+                "Optimized internal system communication architecture and reduced message processing latency by rewriting critical sections with Python and Threading structure."
+            ]
+        },
+        {
+            "title": "Programmer",
+            "company": "Tafifti",
+            "location": "Bandar Abbas, Hormozgan",
+            "dates": "April 2020 - November 2020",
+            "duties": [
+                "Developed software solutions as part of the programming team, contributing to various projects in web and automation."
+            ]
+        }
+    ],
+    "certifications": [
+        {
+            "name": "LPIC-1: Linux Administrator",
+            "issuer": "Linux Professional Institute",
+            "date": "Issued date not specified",
+            "link": "https://www.lpi.org/our-certifications/lpic-1-overview"
+        },
+        {
+            "name": "Python Programming Certificate",
+            "issuer": "Technical and Vocational Training Organization",
+            "date": "Issued date not specified",
+            "link": null
+        }
+    ],
+    "skills": {
+        "frontend": "Vue.js, jQuery, JavaScript, Bootstrap, Tkinter, Electron.js, Nuxt.js",
+        "backend": "Python, Django, Flask, FastAPI, Celery, C++, Requests, SQLAlchemy",
+        "database": "MariaDB, PostgreSQL, Redis, ORM, Query Optimization",
+        "tools": "Git, Docker, Linux (Ubuntu), Bash, Lua, Unittest, Doctest, Pandas, NumPy, Postfix, Nginx, Apache2, iptables, MikroTik, Grafana, Web Scraping, Cronjob, Threading, MQTT Broker",
+        "cloud": "AWS, Azure, Heroku",
+        "other": "PLC (Siemens, Delta), HMI, OPC UA, BI Dashboards, Network Routing, Firewall, VPN, System Monitoring, Automation Scripting, IoT Development"
+    },
+    "aboutText1": "Hello! I'm Mohammad Amin Vakili, a passionate software engineer with extensive experience in developing web and desktop systems, process automation, and data analysis.",
+    "aboutText2": "Specialized in Python, Django, Flask, Vue.js, Electron.js, and managing databases like MariaDB and PostgreSQL. Proven track record in designing production management systems, PLC integrations, APIs, financial systems, and BI tools.",
+    "aboutText3": "Active contributor to open-source projects on GitHub. Interested in AI and large language models (LLM) for business applications. Skilled in network configuration, server management, and optimizing architectures for enhanced efficiency and stability."
+}

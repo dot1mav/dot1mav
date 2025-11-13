@@ -1,8 +1,199 @@
-<html>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
 <head>
-  <title>dot1mav</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mohammad Amin Vakili Portfolio - Software Engineer & Developer">
+    <title>MAV Portfolio</title>
+
+    <!-- 98.css for Windows 98 styling -->
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Favicon -->
+    <link rel="icon" href="https://img.icons8.com/3d-fluency/94/computer.png" type="image/png">
 </head>
+
 <body>
-<center style="margin-top: 45%;font-size: 15em;">mav is here</center>
+    <div id="app">
+        <!-- Desktop -->
+        <main class="desktop">
+            <div class="icon" @click="openWindow('projects')" @dblclick="openWindow('projects')">
+                <img src="https://img.icons8.com/3d-fluency/94/code-file.png" alt="Projects">
+                <span>Projects</span>
+            </div>
+
+            <div class="icon" @click="openWindow('experiences')" @dblclick="openWindow('experiences')">
+                <img src="https://img.icons8.com/3d-fluency/94/briefcase.png" alt="Experiences">
+                <span>Experiences</span>
+            </div>
+
+            <div class="icon" @click="openWindow('skills')" @dblclick="openWindow('skills')">
+                <img src="https://img.icons8.com/3d-fluency/94/settings.png" alt="Skills">
+                <span>Skills</span>
+            </div>
+
+            <div class="icon" @click="openWindow('certifications')" @dblclick="openWindow('certifications')">
+                <img src="https://img.icons8.com/3d-fluency/94/certificate.png" alt="Certifications">
+                <span>Certifications</span>
+            </div>
+
+            <div class="icon" @click="openWindow('contact')" @dblclick="openWindow('contact')">
+                <img src="https://img.icons8.com/3d-fluency/94/user-male.png" alt="Contact">
+                <span>Contact</span>
+            </div>
+
+            <div class="icon" @click="openWindow('about')" @dblclick="openWindow('about')">
+                <img src="https://img.icons8.com/3d-fluency/94/info.png" alt="About">
+                <span>About</span>
+            </div>
+        </main>
+
+        <!-- Loading Window -->
+        <div v-if="isLoading" class="loading-window">
+            <div class="window">
+                <div class="title-bar">
+                    <div class="title-bar-text">Loading...</div>
+                </div>
+                <div class="window-body">
+                    <p>Please wait while loading data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Windows -->
+        <div v-for="(window, id) in windows" :key="id" :class="['window', 'draggable', { minimized: window.minimized }]"
+            :style="{ 
+                 left: window.x + 'px', 
+                 top: window.y + 'px', 
+                 width: window.width + 'px',
+                 display: window.open ? 'block' : 'none'
+             }">
+            <div class="title-bar" @mousedown="startDrag($event, id)">
+                <div class="title-bar-text">{{ window.title }}</div>
+                <div class="title-bar-controls">
+                    <button @click="minimizeWindow(id)" aria-label="Minimize">_</button>
+                    <button @click="maximizeWindow(id)" aria-label="Maximize">□</button>
+                    <button @click="closeWindow(id)" aria-label="Close">×</button>
+                </div>
+            </div>
+            <div class="window-body">
+                <!-- Projects Content -->
+                <div v-if="id === 'projects'">
+                    <table class="projects-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Tech Stack</th>
+                                <th>Description</th>
+                                <th>Demo/Repo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="project in projects" :key="project.title">
+                                <td><strong>{{ project.title }}</strong></td>
+                                <td>{{ project.tech_stack }}</td>
+                                <td>{{ project.description }}</td>
+                                <td>
+                                    <a v-if="project.demo_link" :href="project.demo_link" target="_blank"
+                                        rel="noopener noreferrer">View</a>
+                                    <span v-else>N/A</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Experiences Content -->
+                <div v-if="id === 'experiences'">
+                    <div v-for="exp in experiences" :key="exp.title" class="experience-item">
+                        <h3>{{ exp.title }} at {{ exp.company }}</h3>
+                        <p><strong>Location:</strong> {{ exp.location }}</p>
+                        <p><strong>Dates:</strong> {{ exp.dates }}</p>
+                        <ul>
+                            <li v-for="duty in exp.duties" :key="duty">{{ duty }}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Certifications Content -->
+                <div v-if="id === 'certifications'">
+                    <ul>
+                        <li v-for="cert in certifications" :key="cert.name">
+                            <strong>{{ cert.name }}</strong> - {{ cert.issuer }} ({{ cert.date }})
+                            <a v-if="cert.link" :href="cert.link" target="_blank" rel="noopener noreferrer">Link</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Skills Content -->
+                <div v-if="id === 'skills'">
+                    <div v-for="(value, key) in skills" :key="key" class="skill-category">
+                        <strong>{{ formatKey(key) }}:</strong> {{ value }}
+                    </div>
+                </div>
+
+                <!-- Contact Content -->
+                <div v-if="id === 'contact'">
+                    <p><strong>Email:</strong> dot1mav@gmail.com</p>
+                    <p><strong>Phone:</strong> (+98) 917 169 8273</p>
+                    <p><strong>GitHub:</strong> <a href="https://github.com/dot1mav" target="_blank"
+                            rel="noopener noreferrer">github.com/dot1mav</a></p>
+                    <p><strong>LinkedIn:</strong> <a href="https://ir.linkedin.com/in/dot1mav" target="_blank"
+                            rel="noopener noreferrer">linkedin.com/in/dot1mav</a></p>
+                    <p><strong>Location:</strong> Bandar Abbas, Hormozgan, Iran</p>
+                </div>
+
+                <!-- About Content -->
+                <div v-if="id === 'about'">
+                    <img src="images/photo.jpg" alt="Mohammad Amin Vakili" class="profile-photo">
+                    <h1>Mohammad Amin Vakili</h1>
+                    <p>Software Developer</p>
+                    <p><strong>Email:</strong> dot1mav@gmail.com</p>
+                    <p><strong>Phone:</strong> (+98) 917 169 8273</p>
+                    <p><strong>Website:</strong> dot1mav.ir</p>
+                    <p><strong>Address:</strong> Hormozgan, Bandar Abbas</p>
+                    <p><strong>Birthdate:</strong> 1998-05-30</p>
+                    <p><strong>Marital Status:</strong> Single</p>
+                    <p><strong>Military Status:</strong> Conscript</p>
+                    <h2>Resume Summary</h2>
+                    <p>Software engineer with experience in web and desktop systems development, process automation, and
+                        data analysis. Specialist in Python, Django, Flask, Vue.js, Electron.js, and managing MariaDB
+                        and PostgreSQL databases. History of designing and implementing production management systems,
+                        integration with PLC, API, and financial systems, developing responsive user interfaces and BI,
+                        and participating in Open Source projects. Interested in artificial intelligence and developing
+                        large language models (LLM) for business applications.</p>
+                    <h2>Educational Background</h2>
+                    <p>Bachelor's in Computer Engineering - Software</p>
+                    <p>Hormozgan University, Bandar Abbas</p>
+                    <p>2016 - Present</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Taskbar -->
+        <div id="taskbar">
+            <div id="taskbar-buttons">
+                <button v-for="(window, id) in openTaskbarWindows" :key="id" @click="restoreWindow(id)">
+                    {{ window.title }}
+                </button>
+            </div>
+            <div id="taskbar-copyright">&copy; 2025 Mohammad Amin Vakili</div>
+            <div id="taskbar-clock">{{ currentTime }}</div>
+            <button id="dark-mode-toggle" @click="toggleDarkMode" :aria-label="isDarkMode ? 'Light Mode' : 'Dark Mode'">
+                {{ isDarkMode ? '☀️' : '🌙' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="js/app.js"></script>
 </body>
+
 </html>

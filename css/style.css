@@ -1,0 +1,769 @@
+/* ================================================
+   MAV Portfolio
+   ================================================ */
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'MS Sans Serif', 'Tahoma', 'Arial', sans-serif;
+    overflow: hidden;
+    background: url('https://wallpapers.com/images/high/windows-xp-background-1920-x-1080-3d8w2v1z0q4q4q4q.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* Light Mode (Default) - True Windows 98 Colors */
+:root {
+    --desktop-bg: transparent;
+    --window-bg: #c0c0c0;
+    --window-body-bg: #ffffff;
+    --title-bar-bg: #000080;
+    --title-bar-text: #ffffff;
+    --text-color: #000000;
+    --border-dark: #808080;
+    --border-light: #ffffff;
+    --border-darkest: #000000;
+    --button-face: #c0c0c0;
+    --button-shadow: #808080;
+    --button-highlight: #ffffff;
+    --link-color: #0000ff;
+    --link-visited: #800080;
+    --link-hover: #ff0000;
+    --table-header: #000080;
+    --table-header-text: #ffffff;
+    --scrollbar-face: #c0c0c0;
+    --header-bg: #f0f8ff;
+    /* Light blue like in resume */
+    --header-border: #0000ff;
+    /* Blue border */
+}
+
+/* Dark Mode - Windows 98 Dark Theme */
+body.dark-mode {
+    --desktop-bg: transparent;
+    --window-bg: #808080;
+    --window-body-bg: #c0c0c0;
+    --title-bar-bg: #000000;
+    --title-bar-text: #ffffff;
+    --text-color: #000000;
+    --border-dark: #404040;
+    --border-light: #c0c0c0;
+    --border-darkest: #000000;
+    --button-face: #808080;
+    --button-shadow: #404040;
+    --button-highlight: #c0c0c0;
+    --link-color: #0000ff;
+    --link-visited: #800080;
+    --link-hover: #ff0000;
+    --table-header: #000000;
+    --table-header-text: #ffffff;
+    --scrollbar-face: #808080;
+    --header-bg: #404040;
+    /* Darker for dark mode */
+    --header-border: #0000ff;
+}
+
+/* Desktop */
+.desktop {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    background: var(--desktop-bg);
+    background-image: url("../images/background.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: calc(100vh - 28px);
+    align-content: flex-start;
+    overflow: auto;
+}
+
+/* Desktop Icons */
+.icon {
+    width: 80px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+    position: relative;
+    user-select: none;
+}
+
+.icon:hover {
+    transform: scale(1.1);
+    filter: brightness(1.1);
+}
+
+.icon:active {
+    filter: brightness(0.9);
+}
+
+.icon img {
+    width: 48px;
+    height: 48px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    display: block;
+    margin: 0 auto;
+    pointer-events: none;
+}
+
+.icon span {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #ffffff;
+    text-shadow: 1px 1px 0 #000000;
+    font-weight: normal;
+    padding: 0;
+}
+
+/* Window Styling - Classic Windows 98 */
+.window {
+    position: absolute;
+    background: var(--window-bg);
+    border-top: 2px solid var(--border-light);
+    border-left: 2px solid var(--border-light);
+    border-right: 2px solid var(--border-darkest);
+    border-bottom: 2px solid var(--border-darkest);
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: 'MS Sans Serif', 'Tahoma', sans-serif;
+    min-width: 250px;
+    min-height: 200px;
+    z-index: 100;
+    transition: box-shadow 0.2s ease, opacity 0.3s ease;
+    resize: both;
+    overflow: auto;
+}
+
+.window:hover {
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.window.minimized {
+    display: none !important;
+}
+
+.window.maximized {
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 28px) !important;
+    resize: none;
+}
+
+.title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--title-bar-bg);
+    color: var(--title-bar-text);
+    padding: 2px 3px 2px 3px;
+    cursor: move;
+    user-select: none;
+    height: 18px;
+}
+
+.title-bar-text {
+    font-weight: bold;
+    font-size: 11px;
+    line-height: 18px;
+}
+
+.title-bar-controls {
+    display: flex;
+    gap: 2px;
+}
+
+.title-bar-controls button {
+    background: var(--button-face);
+    border-top: 1px solid var(--border-light);
+    border-left: 1px solid var(--border-light);
+    border-right: 1px solid var(--border-darkest);
+    border-bottom: 1px solid var(--border-darkest);
+    width: 16px;
+    height: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: var(--text-color);
+    line-height: 1;
+    transition: background 0.1s;
+}
+
+.title-bar-controls button:hover {
+    background: #e0e0e0;
+}
+
+.title-bar-controls button:active {
+    border-top: 1px solid var(--border-darkest);
+    border-left: 1px solid var(--border-darkest);
+    border-right: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
+    padding: 1px 0 0 1px;
+}
+
+.title-bar-controls button:disabled {
+    color: var(--border-dark);
+    cursor: default;
+}
+
+/* Window Body */
+.window-body {
+    padding: 8px;
+    background: var(--window-body-bg);
+    color: var(--text-color);
+    border-top: 1px solid var(--border-dark);
+    height: calc(100% - 18px);
+    overflow: auto;
+}
+
+/* Projects Table */
+.projects-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    background: var(--window-body-bg);
+}
+
+.projects-table th,
+.projects-table td {
+    border: 1px solid var(--border-dark);
+    padding: 4px 6px;
+    text-align: left;
+}
+
+.projects-table th {
+    background: var(--table-header);
+    color: var(--table-header-text);
+    font-weight: bold;
+}
+
+.projects-table tr:hover {
+    background: #000080;
+    color: #ffffff;
+}
+
+.projects-table tr:hover a {
+    color: #ffff00;
+}
+
+.projects-table a {
+    color: var(--link-color);
+    text-decoration: underline;
+}
+
+.projects-table a:visited {
+    color: var(--link-visited);
+}
+
+/* Experience Item */
+.experience-item {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid var(--border-dark);
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.experience-item h3 {
+    margin: 0 0 5px;
+}
+
+.experience-item ul {
+    margin: 5px 0 0 20px;
+}
+
+/* Skill Category */
+.skill-category {
+    margin-bottom: 10px;
+    padding: 5px;
+    background: #e8e8e8;
+    border-radius: 4px;
+}
+
+/* Profile Photo */
+.profile-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Contact Info & Paragraphs */
+.window-body p {
+    margin: 0 0 8px 0;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.window-body p:last-child {
+    margin-bottom: 0;
+}
+
+.window-body a {
+    color: var(--link-color);
+    text-decoration: underline;
+}
+
+.window-body a:visited {
+    color: var(--link-visited);
+}
+
+.window-body a:hover {
+    color: var(--link-hover);
+}
+
+/* Taskbar - Classic Windows 98 */
+#taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 28px;
+    background: var(--button-face);
+    border-top: 2px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    padding: 2px 2px 2px 2px;
+    z-index: 999;
+    gap: 4px;
+}
+
+#taskbar-buttons {
+    display: flex;
+    gap: 2px;
+    flex-wrap: nowrap;
+    flex: 1;
+    overflow-x: auto;
+}
+
+#taskbar-buttons button {
+    padding: 2px 8px;
+    border-top: 2px solid var(--border-light);
+    border-left: 2px solid var(--border-light);
+    border-right: 2px solid var(--border-darkest);
+    border-bottom: 2px solid var(--border-darkest);
+    background: var(--button-face);
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--text-color);
+    white-space: nowrap;
+    min-width: 0;
+    transition: background 0.1s;
+}
+
+#taskbar-buttons button:hover {
+    background: #e0e0e0;
+}
+
+#taskbar-buttons button:active {
+    border-top: 2px solid var(--border-darkest);
+    border-left: 2px solid var(--border-darkest);
+    border-right: 2px solid var(--border-light);
+    border-bottom: 2px solid var(--border-light);
+    padding: 3px 7px 1px 9px;
+}
+
+/* Taskbar Copyright */
+#taskbar-copyright {
+    padding: 0 8px;
+    font-size: 10px;
+    color: var(--text-color);
+    white-space: nowrap;
+}
+
+/* Taskbar Clock */
+#taskbar-clock {
+    padding: 0 8px;
+    font-size: 11px;
+    color: var(--text-color);
+}
+
+/* Dark Mode Toggle Button */
+#dark-mode-toggle {
+    padding: 2px 6px;
+    border-top: 2px solid var(--border-light);
+    border-left: 2px solid var(--border-light);
+    border-right: 2px solid var(--border-darkest);
+    border-bottom: 2px solid var(--border-darkest);
+    background: var(--button-face);
+    cursor: pointer;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    min-width: 45px;
+    color: var(--text-color);
+    transition: background 0.1s;
+}
+
+#dark-mode-toggle:hover {
+    background: #e0e0e0;
+}
+
+#dark-mode-toggle:active {
+    border-top: 2px solid var(--border-darkest);
+    border-left: 2px solid var(--border-darkest);
+    border-right: 2px solid var(--border-light);
+    border-bottom: 2px solid var(--border-light);
+    padding: 3px 5px 1px 7px;
+}
+
+/* Loading Window */
+.loading-window {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+/* Draggable Elements */
+.draggable {
+    user-select: none;
+}
+
+/* Header & Footer - Positioned Elements */
+header.window {
+    position: relative;
+    width: calc(100% - 16px);
+    margin: 8px 8px 16px 8px;
+    background: var(--header-bg);
+    border-bottom: 2px solid var(--header-border);
+}
+
+header .header-body {
+    text-align: center;
+    padding: 12px 8px;
+}
+
+header .header-body h1 {
+    margin: 0 0 6px 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+header .header-body p {
+    margin: 0;
+    font-size: 11px;
+    color: var(--text-color);
+}
+
+header .header-body h2 {
+    margin: 10px 0 5px;
+    font-size: 14px;
+    color: #0000ff;
+    /* Blue like in resume */
+    border-bottom: 1px solid #0000ff;
+}
+
+/* Scrollbar - Windows 98 Style */
+::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--window-body-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-face);
+    border-top: 1px solid var(--border-light);
+    border-left: 1px solid var(--border-light);
+    border-right: 1px solid var(--border-darkest);
+    border-bottom: 1px solid var(--border-darkest);
+}
+
+::-webkit-scrollbar-button {
+    background: var(--button-face);
+    border-top: 1px solid var(--border-light);
+    border-left: 1px solid var(--border-light);
+    border-right: 1px solid var(--border-darkest);
+    border-bottom: 1px solid var(--border-darkest);
+}
+
+/* ================================================
+   RESPONSIVE DESIGN - MOBILE & TABLET
+   ================================================ */
+
+/* Tablet (768px and below) */
+@media screen and (max-width: 768px) {
+    .desktop {
+        padding: 12px;
+        gap: 12px;
+        min-height: calc(100vh - 32px);
+    }
+
+    .icon {
+        width: 70px;
+    }
+
+    .icon img {
+        width: 42px;
+        height: 42px;
+    }
+
+    .icon span {
+        font-size: 10px;
+        margin-top: 3px;
+    }
+
+    header.window {
+        width: calc(100% - 8px);
+        margin: 4px 4px 12px 4px;
+    }
+
+    header .header-body {
+        padding: 10px 6px;
+    }
+
+    header .header-body h1 {
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    header .header-body p {
+        font-size: 10px;
+    }
+
+    .window {
+        min-width: 200px;
+        max-width: calc(100vw - 16px);
+    }
+
+    .window-body {
+        padding: 6px;
+        height: calc(100% - 18px);
+    }
+
+    .projects-table {
+        font-size: 10px;
+    }
+
+    .projects-table th,
+    .projects-table td {
+        padding: 3px 4px;
+    }
+
+    #taskbar {
+        height: 32px;
+        padding: 2px;
+    }
+
+    #taskbar-buttons button {
+        font-size: 10px;
+        padding: 2px 6px;
+        min-width: 60px;
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    #dark-mode-toggle {
+        font-size: 10px;
+        min-width: 40px;
+        padding: 2px 4px;
+    }
+
+    #taskbar-clock {
+        font-size: 10px;
+    }
+
+    #taskbar-copyright {
+        font-size: 9px;
+    }
+}
+
+/* Mobile (480px and below) */
+@media screen and (max-width: 480px) {
+    .desktop {
+        padding: 8px;
+        gap: 10px;
+        min-height: calc(100vh - 28px);
+    }
+
+    .icon {
+        width: 60px;
+    }
+
+    .icon img {
+        width: 36px;
+        height: 36px;
+    }
+
+    .icon span {
+        font-size: 9px;
+        margin-top: 2px;
+    }
+
+    header.window {
+        width: calc(100% - 4px);
+        margin: 2px 2px 8px 2px;
+    }
+
+    header .header-body {
+        padding: 8px 4px;
+    }
+
+    header .header-body h1 {
+        font-size: 12px;
+        margin-bottom: 3px;
+    }
+
+    header .header-body p {
+        font-size: 9px;
+    }
+
+    .window {
+        min-width: 150px;
+        max-width: calc(100vw - 8px);
+    }
+
+    .window-body {
+        padding: 5px;
+        height: calc(100% - 18px);
+        font-size: 10px;
+    }
+
+    .window-body p {
+        font-size: 10px;
+        margin: 0 0 6px 0;
+    }
+
+    .title-bar {
+        padding: 2px 2px;
+        height: 16px;
+    }
+
+    .title-bar-text {
+        font-size: 10px;
+    }
+
+    .title-bar-controls button {
+        width: 14px;
+        height: 12px;
+        font-size: 8px;
+    }
+
+    .projects-table {
+        font-size: 9px;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .projects-table thead,
+    .projects-table tbody,
+    .projects-table tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .projects-table th,
+    .projects-table td {
+        padding: 2px 3px;
+    }
+
+    #taskbar {
+        height: 28px;
+        padding: 1px;
+    }
+
+    #taskbar-buttons {
+        gap: 1px;
+        overflow-x: auto;
+    }
+
+    #taskbar-buttons button {
+        font-size: 9px;
+        padding: 1px 4px;
+        min-width: 50px;
+        max-width: 80px;
+    }
+
+    #dark-mode-toggle {
+        font-size: 9px;
+        min-width: 35px;
+        padding: 1px 3px;
+        height: 20px;
+    }
+
+    #taskbar-clock {
+        font-size: 9px;
+    }
+
+    #taskbar-copyright {
+        font-size: 8px;
+    }
+
+    ::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+/* Landscape Mobile */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .desktop {
+        min-height: calc(100vh - 28px);
+    }
+
+    .window-body {
+        height: calc(100% - 18px);
+    }
+
+    header.window {
+        margin: 2px 4px 6px 4px;
+    }
+
+    header .header-body {
+        padding: 6px 4px;
+    }
+
+    header .header-body h1 {
+        font-size: 11px;
+        margin-bottom: 2px;
+    }
+
+    header .header-body p {
+        font-size: 9px;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .icon {
+        padding: 4px;
+    }
+
+    .title-bar-controls button {
+        width: 18px;
+        height: 16px;
+    }
+
+    #taskbar-buttons button,
+    #dark-mode-toggle {
+        min-height: 24px;
+    }
+
+    .title-bar {
+        cursor: default;
+    }
+}

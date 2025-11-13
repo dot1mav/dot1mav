@@ -10,15 +10,13 @@
 }
 
 body {
-    margin: 0;
-    padding: 0;
     font-family: 'MS Sans Serif', 'Tahoma', 'Arial', sans-serif;
-    overflow: hidden;
-    background: url('https://wallpapers.com/images/high/windows-xp-background-1920-x-1080-3d8w2v1z0q4q4q4q.jpg') no-repeat center center fixed;
+    background: url('../images/background.jpg') no-repeat center center fixed;
     background-size: cover;
+    overflow: hidden;
 }
 
-/* Light Mode (Default) - True Windows 98 Colors */
+/* Light Mode Default */
 :root {
     --desktop-bg: transparent;
     --window-bg: #c0c0c0;
@@ -39,12 +37,10 @@ body {
     --table-header-text: #ffffff;
     --scrollbar-face: #c0c0c0;
     --header-bg: #f0f8ff;
-    /* Light blue like in resume */
     --header-border: #0000ff;
-    /* Blue border */
 }
 
-/* Dark Mode - Windows 98 Dark Theme */
+/* Dark Mode */
 body.dark-mode {
     --desktop-bg: transparent;
     --window-bg: #808080;
@@ -65,7 +61,6 @@ body.dark-mode {
     --table-header-text: #ffffff;
     --scrollbar-face: #808080;
     --header-bg: #404040;
-    /* Darker for dark mode */
     --header-border: #0000ff;
 }
 
@@ -75,56 +70,52 @@ body.dark-mode {
     flex-wrap: wrap;
     gap: 20px;
     padding: 20px;
-    background: var(--desktop-bg);
-    background-image: url("../images/background.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
     min-height: calc(100vh - 28px);
-    align-content: flex-start;
     overflow: auto;
+    background: var(--desktop-bg);
 }
 
 /* Desktop Icons */
 .icon {
-    width: 80px;
+    width: 84px;
+    height: 84px;
     text-align: center;
     cursor: pointer;
-    transition: transform 0.2s ease, filter 0.2s ease;
+    transition: transform 0.12s ease, filter 0.12s ease;
     position: relative;
     user-select: none;
-}
-
-.icon:hover {
-    transform: scale(1.1);
-    filter: brightness(1.1);
-}
-
-.icon:active {
-    filter: brightness(0.9);
+    padding: 4px 2px;
+    border-radius: 6px;
 }
 
 .icon img {
-    width: 48px;
-    height: 48px;
-    border: none;
-    background: transparent;
-    padding: 0;
-    display: block;
+    width: 56px;
+    height: 56px;
     margin: 0 auto;
+    display: block;
     pointer-events: none;
 }
 
 .icon span {
     display: block;
-    margin-top: 4px;
-    font-size: 11px;
-    color: #ffffff;
-    text-shadow: 1px 1px 0 #000000;
-    font-weight: normal;
-    padding: 0;
+    margin-top: 2px;
+    font-size: 12px;
+    line-height: 1.1;
+    color: var(--text-color);
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
-/* Window Styling - Classic Windows 98 */
+.icon:hover {
+    transform: scale(1.06);
+    filter: brightness(1.05);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+
+/* Windows */
 .window {
     position: absolute;
     background: var(--window-bg);
@@ -133,21 +124,11 @@ body.dark-mode {
     border-right: 2px solid var(--border-darkest);
     border-bottom: 2px solid var(--border-darkest);
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    font-family: 'MS Sans Serif', 'Tahoma', sans-serif;
     min-width: 250px;
     min-height: 200px;
     z-index: 100;
-    transition: box-shadow 0.2s ease, opacity 0.3s ease;
     resize: both;
-    overflow: auto;
-}
-
-.window:hover {
-    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
-}
-
-.window.minimized {
-    display: none !important;
+    overflow: visible;
 }
 
 .window.maximized {
@@ -158,22 +139,26 @@ body.dark-mode {
     resize: none;
 }
 
+.window.minimized {
+    display: none !important;
+}
+
+/* Title Bar */
 .title-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 18px;
+    padding: 2px 3px;
     background: var(--title-bar-bg);
     color: var(--title-bar-text);
-    padding: 2px 3px 2px 3px;
     cursor: move;
     user-select: none;
-    height: 18px;
 }
 
 .title-bar-text {
     font-weight: bold;
     font-size: 11px;
-    line-height: 18px;
 }
 
 .title-bar-controls {
@@ -182,23 +167,21 @@ body.dark-mode {
 }
 
 .title-bar-controls button {
+    width: 16px;
+    height: 14px;
     background: var(--button-face);
     border-top: 1px solid var(--border-light);
     border-left: 1px solid var(--border-light);
     border-right: 1px solid var(--border-darkest);
     border-bottom: 1px solid var(--border-darkest);
-    width: 16px;
-    height: 14px;
+    font-size: 9px;
     font-weight: bold;
+    color: var(--text-color);
     cursor: pointer;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 9px;
-    color: var(--text-color);
-    line-height: 1;
-    transition: background 0.1s;
 }
 
 .title-bar-controls button:hover {
@@ -213,61 +196,156 @@ body.dark-mode {
     padding: 1px 0 0 1px;
 }
 
-.title-bar-controls button:disabled {
-    color: var(--border-dark);
-    cursor: default;
-}
-
 /* Window Body */
 .window-body {
     padding: 8px;
+    margin: auto;
     background: var(--window-body-bg);
     color: var(--text-color);
     border-top: 1px solid var(--border-dark);
-    height: calc(100% - 18px);
     overflow: auto;
+    max-height: calc(100% - 18px);
 }
 
-/* Projects Table */
-.projects-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 11px;
+/* Projects Cards */
+.projects-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+}
+
+.project-card {
     background: var(--window-body-bg);
-}
-
-.projects-table th,
-.projects-table td {
     border: 1px solid var(--border-dark);
-    padding: 4px 6px;
-    text-align: left;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 120px;
+    font-size: 13px;
 }
 
-.projects-table th {
+.project-card-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.project-title {
+    font-weight: 800;
+    font-size: 15px;
+}
+
+.project-tech {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 45%;
+}
+
+.tech-tag {
+    background: rgba(0, 0, 0, 0.04);
+    padding: 3px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.project-desc {
+    flex: 1 1 auto;
+    margin-bottom: 8px;
+    line-height: 1.35;
+}
+
+.project-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.project-date {
+    font-size: 12px;
+    color: var(--border-dark);
+}
+
+/* Project Buttons */
+.project-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-primary {
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 13px;
     background: var(--table-header);
     color: var(--table-header-text);
-    font-weight: bold;
+    text-decoration: none;
+    border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.projects-table tr:hover {
-    background: #000080;
-    color: #ffffff;
+.btn-disabled {
+    color: var(--border-dark);
+    font-size: 13px;
 }
 
-.projects-table tr:hover a {
-    color: #ffff00;
+/* Project Accordion */
+.project-details {
+    border: 1px solid var(--border-dark);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--window-body-bg);
+    margin-bottom: 8px;
 }
 
-.projects-table a {
-    color: var(--link-color);
-    text-decoration: underline;
+.project-summary {
+    padding: 8px 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
 }
 
-.projects-table a:visited {
-    color: var(--link-visited);
+.project-body {
+    padding: 8px 10px;
+    border-top: 1px solid var(--border-light);
 }
 
-/* Experience Item */
+/* Projects Controls */
+.projects-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.projects-controls input[type="search"] {
+    flex: 1 1 220px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border-dark);
+    font-size: 13px;
+    background: var(--window-body-bg);
+    color: var(--text-color);
+}
+
+.projects-controls select {
+    border-radius: 6px;
+    border: 1px solid var(--border-dark);
+    background: var(--button-face);
+    font-size: 13px;
+    color: var(--text-color);
+}
+
+/* Experience Items */
 .experience-item {
     margin-bottom: 15px;
     padding: 10px;
@@ -277,14 +355,14 @@ body.dark-mode {
 }
 
 .experience-item h3 {
-    margin: 0 0 5px;
+    margin-bottom: 5px;
 }
 
 .experience-item ul {
-    margin: 5px 0 0 20px;
+    margin-left: 20px;
 }
 
-/* Skill Category */
+/* Skills */
 .skill-category {
     margin-bottom: 10px;
     padding: 5px;
@@ -302,31 +380,38 @@ body.dark-mode {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
-/* Contact Info & Paragraphs */
-.window-body p {
-    margin: 0 0 8px 0;
+/* Header */
+header.window {
+    position: relative;
+    width: calc(100% - 16px);
+    margin: 8px;
+    background: var(--header-bg);
+    border-bottom: 2px solid var(--header-border);
+}
+
+header .header-body {
+    text-align: center;
+    padding: 12px 8px;
+}
+
+header .header-body h1 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+header .header-body p {
     font-size: 11px;
-    line-height: 1.4;
 }
 
-.window-body p:last-child {
-    margin-bottom: 0;
+header .header-body h2 {
+    font-size: 14px;
+    margin: 10px 0 5px;
+    color: #0000ff;
+    border-bottom: 1px solid #0000ff;
 }
 
-.window-body a {
-    color: var(--link-color);
-    text-decoration: underline;
-}
-
-.window-body a:visited {
-    color: var(--link-visited);
-}
-
-.window-body a:hover {
-    color: var(--link-hover);
-}
-
-/* Taskbar - Classic Windows 98 */
+/* Taskbar */
 #taskbar {
     position: fixed;
     bottom: 0;
@@ -337,15 +422,14 @@ body.dark-mode {
     border-top: 2px solid var(--border-light);
     display: flex;
     align-items: center;
-    padding: 2px 2px 2px 2px;
-    z-index: 999;
+    padding: 2px;
     gap: 4px;
+    z-index: 999;
 }
 
 #taskbar-buttons {
     display: flex;
     gap: 2px;
-    flex-wrap: nowrap;
     flex: 1;
     overflow-x: auto;
 }
@@ -357,12 +441,11 @@ body.dark-mode {
     border-right: 2px solid var(--border-darkest);
     border-bottom: 2px solid var(--border-darkest);
     background: var(--button-face);
-    cursor: pointer;
     font-size: 11px;
     color: var(--text-color);
+    cursor: pointer;
     white-space: nowrap;
     min-width: 0;
-    transition: background 0.1s;
 }
 
 #taskbar-buttons button:hover {
@@ -377,36 +460,25 @@ body.dark-mode {
     padding: 3px 7px 1px 9px;
 }
 
-/* Taskbar Copyright */
+#taskbar-clock,
 #taskbar-copyright {
-    padding: 0 8px;
-    font-size: 10px;
-    color: var(--text-color);
-    white-space: nowrap;
-}
-
-/* Taskbar Clock */
-#taskbar-clock {
-    padding: 0 8px;
     font-size: 11px;
     color: var(--text-color);
+    padding: 0 8px;
 }
 
-/* Dark Mode Toggle Button */
+/* Dark Mode Toggle */
 #dark-mode-toggle {
     padding: 2px 6px;
-    border-top: 2px solid var(--border-light);
-    border-left: 2px solid var(--border-light);
-    border-right: 2px solid var(--border-darkest);
-    border-bottom: 2px solid var(--border-darkest);
+    border: 2px solid var(--border-light);
     background: var(--button-face);
     cursor: pointer;
     font-size: 11px;
+    height: 22px;
+    min-width: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 22px;
-    min-width: 45px;
     color: var(--text-color);
     transition: background 0.1s;
 }
@@ -415,64 +487,7 @@ body.dark-mode {
     background: #e0e0e0;
 }
 
-#dark-mode-toggle:active {
-    border-top: 2px solid var(--border-darkest);
-    border-left: 2px solid var(--border-darkest);
-    border-right: 2px solid var(--border-light);
-    border-bottom: 2px solid var(--border-light);
-    padding: 3px 5px 1px 7px;
-}
-
-/* Loading Window */
-.loading-window {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-}
-
-/* Draggable Elements */
-.draggable {
-    user-select: none;
-}
-
-/* Header & Footer - Positioned Elements */
-header.window {
-    position: relative;
-    width: calc(100% - 16px);
-    margin: 8px 8px 16px 8px;
-    background: var(--header-bg);
-    border-bottom: 2px solid var(--header-border);
-}
-
-header .header-body {
-    text-align: center;
-    padding: 12px 8px;
-}
-
-header .header-body h1 {
-    margin: 0 0 6px 0;
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--text-color);
-}
-
-header .header-body p {
-    margin: 0;
-    font-size: 11px;
-    color: var(--text-color);
-}
-
-header .header-body h2 {
-    margin: 10px 0 5px;
-    font-size: 14px;
-    color: #0000ff;
-    /* Blue like in resume */
-    border-bottom: 1px solid #0000ff;
-}
-
-/* Scrollbar - Windows 98 Style */
+/* Scrollbar */
 ::-webkit-scrollbar {
     width: 16px;
     height: 16px;
@@ -490,24 +505,12 @@ header .header-body h2 {
     border-bottom: 1px solid var(--border-darkest);
 }
 
-::-webkit-scrollbar-button {
-    background: var(--button-face);
-    border-top: 1px solid var(--border-light);
-    border-left: 1px solid var(--border-light);
-    border-right: 1px solid var(--border-darkest);
-    border-bottom: 1px solid var(--border-darkest);
-}
-
-/* ================================================
-   RESPONSIVE DESIGN - MOBILE & TABLET
-   ================================================ */
-
-/* Tablet (768px and below) */
+/* Responsive: Tablet & Mobile */
 @media screen and (max-width: 768px) {
     .desktop {
         padding: 12px;
         gap: 12px;
-        min-height: calc(100vh - 32px);
+        min-height: calc(100vh-32px);
     }
 
     .icon {
@@ -524,246 +527,45 @@ header .header-body h2 {
         margin-top: 3px;
     }
 
-    header.window {
-        width: calc(100% - 8px);
-        margin: 4px 4px 12px 4px;
-    }
-
-    header .header-body {
-        padding: 10px 6px;
-    }
-
-    header .header-body h1 {
-        font-size: 14px;
-        margin-bottom: 4px;
-    }
-
-    header .header-body p {
-        font-size: 10px;
-    }
-
     .window {
         min-width: 200px;
-        max-width: calc(100vw - 16px);
+        max-width: calc(100vw-16px);
     }
 
     .window-body {
         padding: 6px;
-        height: calc(100% - 18px);
-    }
-
-    .projects-table {
-        font-size: 10px;
-    }
-
-    .projects-table th,
-    .projects-table td {
-        padding: 3px 4px;
-    }
-
-    #taskbar {
-        height: 32px;
-        padding: 2px;
-    }
-
-    #taskbar-buttons button {
-        font-size: 10px;
-        padding: 2px 6px;
-        min-width: 60px;
-        max-width: 100px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    #dark-mode-toggle {
-        font-size: 10px;
-        min-width: 40px;
-        padding: 2px 4px;
-    }
-
-    #taskbar-clock {
-        font-size: 10px;
-    }
-
-    #taskbar-copyright {
-        font-size: 9px;
     }
 }
 
-/* Mobile (480px and below) */
-@media screen and (max-width: 480px) {
+@media screen and (max-width:480px) {
     .desktop {
         padding: 8px;
         gap: 10px;
-        min-height: calc(100vh - 28px);
+        min-height: calc(100vh-28px)
     }
 
     .icon {
-        width: 60px;
+        width: 60px
     }
 
     .icon img {
         width: 36px;
-        height: 36px;
+        height: 36px
     }
 
     .icon span {
         font-size: 9px;
-        margin-top: 2px;
-    }
-
-    header.window {
-        width: calc(100% - 4px);
-        margin: 2px 2px 8px 2px;
-    }
-
-    header .header-body {
-        padding: 8px 4px;
-    }
-
-    header .header-body h1 {
-        font-size: 12px;
-        margin-bottom: 3px;
-    }
-
-    header .header-body p {
-        font-size: 9px;
+        margin-top: 2px
     }
 
     .window {
         min-width: 150px;
-        max-width: calc(100vw - 8px);
+        max-width: calc(100vw-8px)
     }
 
     .window-body {
         padding: 5px;
-        height: calc(100% - 18px);
         font-size: 10px;
-    }
-
-    .window-body p {
-        font-size: 10px;
-        margin: 0 0 6px 0;
-    }
-
-    .title-bar {
-        padding: 2px 2px;
-        height: 16px;
-    }
-
-    .title-bar-text {
-        font-size: 10px;
-    }
-
-    .title-bar-controls button {
-        width: 14px;
-        height: 12px;
-        font-size: 8px;
-    }
-
-    .projects-table {
-        font-size: 9px;
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-
-    .projects-table thead,
-    .projects-table tbody,
-    .projects-table tr {
-        display: table;
-        width: 100%;
-        table-layout: fixed;
-    }
-
-    .projects-table th,
-    .projects-table td {
-        padding: 2px 3px;
-    }
-
-    #taskbar {
-        height: 28px;
-        padding: 1px;
-    }
-
-    #taskbar-buttons {
-        gap: 1px;
-        overflow-x: auto;
-    }
-
-    #taskbar-buttons button {
-        font-size: 9px;
-        padding: 1px 4px;
-        min-width: 50px;
-        max-width: 80px;
-    }
-
-    #dark-mode-toggle {
-        font-size: 9px;
-        min-width: 35px;
-        padding: 1px 3px;
-        height: 20px;
-    }
-
-    #taskbar-clock {
-        font-size: 9px;
-    }
-
-    #taskbar-copyright {
-        font-size: 8px;
-    }
-
-    ::-webkit-scrollbar {
-        width: 12px;
-        height: 12px;
-    }
-}
-
-/* Landscape Mobile */
-@media screen and (max-height: 500px) and (orientation: landscape) {
-    .desktop {
-        min-height: calc(100vh - 28px);
-    }
-
-    .window-body {
-        height: calc(100% - 18px);
-    }
-
-    header.window {
-        margin: 2px 4px 6px 4px;
-    }
-
-    header .header-body {
-        padding: 6px 4px;
-    }
-
-    header .header-body h1 {
-        font-size: 11px;
-        margin-bottom: 2px;
-    }
-
-    header .header-body p {
-        font-size: 9px;
-    }
-}
-
-/* Touch device optimizations */
-@media (hover: none) and (pointer: coarse) {
-    .icon {
-        padding: 4px;
-    }
-
-    .title-bar-controls button {
-        width: 18px;
-        height: 16px;
-    }
-
-    #taskbar-buttons button,
-    #dark-mode-toggle {
-        min-height: 24px;
-    }
-
-    .title-bar {
-        cursor: default;
+        height: calc(100%-18px)
     }
 }

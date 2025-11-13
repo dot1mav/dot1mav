@@ -20,6 +20,7 @@ createApp({
           x: 100,
           y: 100,
           width: 800,
+          height: 480,
         },
         experiences: {
           open: false,
@@ -29,6 +30,7 @@ createApp({
           x: 120,
           y: 120,
           width: 700,
+          height: 420,
         },
         skills: {
           open: false,
@@ -38,6 +40,7 @@ createApp({
           x: 140,
           y: 140,
           width: 500,
+          height: 360,
         },
         certifications: {
           open: false,
@@ -47,6 +50,7 @@ createApp({
           x: 160,
           y: 160,
           width: 500,
+          height: 360,
         },
         contact: {
           open: false,
@@ -56,6 +60,7 @@ createApp({
           x: 180,
           y: 180,
           width: 400,
+          height: 300,
         },
         about: {
           open: false,
@@ -65,6 +70,7 @@ createApp({
           x: 200,
           y: 200,
           width: 450,
+          height: 520,
         },
       },
 
@@ -87,6 +93,14 @@ createApp({
       aboutText1: "",
       aboutText2: "",
       aboutText3: "",
+      isMobile: false, // Projects UI state
+      projectsSearch: "",
+      projectsTechFilter: "",
+      projectsSort: "date_desc", // پیش‌فرض: جدیدترین اول
+      groupByYear: true,
+
+      // track which projects expanded
+      expandedProjects: [], // array of titles or unique keys
     };
   },
 
@@ -100,6 +114,113 @@ createApp({
         }
       }
       return result;
+    }, // all available tech tags from projects
+    allProjectTags() {
+      const tags = new Set();
+      (this.projects || []).forEach((p) => {
+        const parts = this.splitTech(p.tech_stack);
+        parts.forEach((t) => tags.add(t));
+      });
+      return Array.from(tags).sort();
+    },
+
+    // filtered and sorted projects (ungrouped)
+    filteredAndSortedProjects() {
+      let list = (this.projects || []).slice();
+
+      // filter by tech tag if selected
+      if (this.projectsTechFilter) {
+        list = list.filter((p) =>
+          this.splitTech(p.tech_stack).includes(this.projectsTechFilter)
+        );
+      }
+
+      // search: title, description, tech_stack
+      const q = (this.projectsSearch || "").trim().toLowerCase();
+      if (q) {
+        list = list.filter((p) => {
+          return (
+            (p.title && p.title.toLowerCase().includes(q)) ||
+            (p.description && p.description.toLowerCase().includes(q)) ||
+            (p.tech_stack && p.tech_stack.toLowerCase().includes(q))
+          );
+        });
+      }
+
+      // parse date for sorting if exists (try multiple formats)
+      const parseDate = (d) => {
+        if (!d) return null;
+        // common YYYY or "Month YYYY - Month YYYY" etc. Try to extract a year or ISO
+        const iso = Date.parse(d);
+        if (!isNaN(iso)) return new Date(iso);
+        // fallback: find 4-digit year
+        const m = d.match(/(19|20)\d{2}/);
+        if (m) return new Date(parseInt(m[0], 10), 0, 1);
+        return null;
+      };
+
+      list.forEach((p) => {
+        p._parsedDate = parseDate(p.date || p.dates || null);
+      });
+
+      // sorting
+      switch (this.projectsSort) {
+        case "title_asc":
+          list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+          break;
+        case "title_desc":
+          list.sort((a, b) => (b.title || "").localeCompare(a.title || ""));
+          break;
+        case "date_asc":
+          list.sort((a, b) => {
+            const A = a._parsedDate ? a._parsedDate.getTime() : -Infinity;
+            const B = b._parsedDate ? b._parsedDate.getTime() : -Infinity;
+            return A - B;
+          });
+          break;
+        case "date_desc":
+        default:
+          list.sort((a, b) => {
+            const A = a._parsedDate ? a._parsedDate.getTime() : -Infinity;
+            const B = b._parsedDate ? b._parsedDate.getTime() : -Infinity;
+            return B - A;
+          });
+          break;
+      }
+
+      return list;
+    },
+
+    // grouped by year (object: { yearLabel: [projects...] })
+    groupedProjects() {
+      const groups = {};
+
+      for (const p of this.filteredAndSortedProjects) {
+        let year = "Undated";
+        if (p._parsedDate instanceof Date && !isNaN(p._parsedDate)) {
+          year = String(p._parsedDate.getFullYear());
+        } else {
+          const candidate = (p.date || p.dates || "").toString();
+          const m = candidate.match(/(19|20)\d{2}/);
+          if (m) year = m[0];
+        }
+
+        if (!groups[year]) groups[year] = [];
+        groups[year].push(p);
+      }
+
+      const entries = Object.entries(groups).map(([year, projects]) => ({
+        year,
+        projects,
+      }));
+
+      entries.sort((a, b) => {
+        if (a.year === "Undated") return 1;
+        if (b.year === "Undated") return -1;
+        return Number(b.year) - Number(a.year);
+      });
+
+      return entries;
     },
   },
 
@@ -128,16 +249,23 @@ createApp({
       const win = this.windows[id];
       win.maximized = !win.maximized;
       if (win.maximized) {
+        // save previous size/position
         win.prevX = win.x;
         win.prevY = win.y;
         win.prevWidth = win.width;
+        win.prevHeight = win.height;
+
+        // set to full available viewport (leave taskbar height 28px)
         win.x = 0;
         win.y = 0;
         win.width = window.innerWidth;
+        win.height = Math.max(window.innerHeight - 28, 200);
       } else {
-        win.x = win.prevX || 100;
-        win.y = win.prevY || 100;
-        win.width = win.prevWidth || 500;
+        // restore previous
+        win.x = win.prevX !== undefined ? win.prevX : 100;
+        win.y = win.prevY !== undefined ? win.prevY : 100;
+        win.width = win.prevWidth !== undefined ? win.prevWidth : 500;
+        win.height = win.prevHeight !== undefined ? win.prevHeight : 400;
       }
     },
 
@@ -209,6 +337,51 @@ createApp({
       document.removeEventListener("mouseup", this.stopDrag);
     },
 
+    updateIsMobile() {
+      this.isMobile = window.innerWidth <= 480; // آستانه دلخواه: 480px (می‌تونی تغییر بدی)
+    },
+
+    splitTech(techString) {
+      if (!techString) return [];
+      return techString
+        .split(/\s*[,\/\|\;]\s*/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+    },
+
+    // truncate text
+    truncate(text, limit = 160) {
+      if (!text) return "";
+      if (text.length <= limit) return text;
+      return text.slice(0, limit).trim() + "…";
+    },
+
+    // toggle expand state for a project
+    isExpanded(project) {
+      return this.expandedProjects.includes(project.title);
+    },
+    toggleExpand(project) {
+      const key = project.title;
+      const idx = this.expandedProjects.indexOf(key);
+      if (idx === -1) this.expandedProjects.push(key);
+      else this.expandedProjects.splice(idx, 1);
+    },
+
+    // format date to short (e.g., 2024 or Jun 2024)
+    formatDateShort(raw) {
+      if (!raw) return "";
+      const iso = Date.parse(raw);
+      if (!isNaN(iso)) {
+        const d = new Date(iso);
+        // show 'YYYY' or 'Mon YYYY' if month exists
+        const month = d.toLocaleString("en-US", { month: "short" });
+        return `${month} ${d.getFullYear()}`;
+      }
+      // fallback: extract year
+      const m = (raw + "").match(/(19|20)\d{2}/);
+      return m ? m[0] : raw;
+    },
+
     // Load Data from JSON
     async loadData() {
       try {
@@ -254,10 +427,14 @@ createApp({
       if (window.innerWidth < 768) {
         Object.keys(this.windows).forEach((id, index) => {
           this.windows[id].x = 20;
-          this.windows[id].y = 50 + index * 30;
+          this.windows[id].y = 50 + index * 40;
           this.windows[id].width = Math.min(
             this.windows[id].width,
             window.innerWidth - 40
+          );
+          this.windows[id].height = Math.min(
+            this.windows[id].height,
+            window.innerHeight - 100
           );
         });
       }
@@ -274,6 +451,14 @@ createApp({
 
     // Initialize app
     this.initializeApp();
+
+    // initial check
+    this.updateIsMobile();
+    // listener برای تغییر اندازه
+    window.addEventListener("resize", this.updateIsMobile);
+
+    // در beforeUnmount (یا قبل از حذف کامپوننت) listener رو پاک کن:
+    window.removeEventListener("resize", this.updateIsMobile);
 
     // Handle window resize
     window.addEventListener("resize", () => {

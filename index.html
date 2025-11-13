@@ -67,45 +67,109 @@
         <!-- Windows -->
         <div v-for="(window, id) in windows" :key="id" :class="['window', 'draggable', { minimized: window.minimized }]"
             :style="{ 
-                 left: window.x + 'px', 
-                 top: window.y + 'px', 
-                 width: window.width + 'px',
-                 display: window.open ? 'block' : 'none'
-             }">
+                left: window.x + 'px', 
+                top: window.y + 'px', 
+                width: window.width + 'px',
+                height: window.height + 'px',
+                display: window.open ? 'block' : 'none'
+            }">
             <div class="title-bar" @mousedown="startDrag($event, id)">
                 <div class="title-bar-text">{{ window.title }}</div>
                 <div class="title-bar-controls">
-                    <button @click="minimizeWindow(id)" aria-label="Minimize">_</button>
-                    <button @click="maximizeWindow(id)" aria-label="Maximize">□</button>
-                    <button @click="closeWindow(id)" aria-label="Close">×</button>
+                    <button @click="minimizeWindow(id)" aria-label="Minimize"></button>
+                    <button @click="maximizeWindow(id)" aria-label="Maximize"></button>
+                    <button @click="closeWindow(id)" aria-label="Close"></button>
                 </div>
             </div>
             <div class="window-body">
-                <!-- Projects Content -->
+                <!-- Projects Content (responsive cards with search, filter, sort, group) -->
                 <div v-if="id === 'projects'">
-                    <table class="projects-table">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Tech Stack</th>
-                                <th>Description</th>
-                                <th>Demo/Repo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="project in projects" :key="project.title">
-                                <td><strong>{{ project.title }}</strong></td>
-                                <td>{{ project.tech_stack }}</td>
-                                <td>{{ project.description }}</td>
-                                <td>
+                    <div class="projects-controls">
+                        <input v-model="projectsSearch" type="search"
+                            placeholder="Search projects (title, description, tech)..." aria-label="Search projects" />
+                        <select v-model="projectsTechFilter">
+                            <option value="">All technologies</option>
+                            <option v-for="t in allProjectTags" :key="t" :value="t">{{ t }}</option>
+                        </select>
+                        <select v-model="projectsSort">
+                            <option value="title_asc">Title ↑</option>
+                            <option value="title_desc">Title ↓</option>
+                            <option value="date_desc">Date ↓ (Newest)</option>
+                            <option value="date_asc">Date ↑ (Oldest)</option>
+                        </select>
+                        <label class="group-toggle">
+                            <input type="checkbox" v-model="groupByYear" />
+                            Group by year (if date exists)
+                        </label>
+                    </div>
+
+                    <!-- grouped view -->
+                    <div v-if="groupByYear">
+                        <div v-for="group in groupedProjects" :key="group.year" class="projects-group">
+                            <h3 class="group-title">{{ group.year }}</h3>
+                            <div class="projects-cards">
+                                <article class="project-card" v-for="project in group.projects" :key="project.title">
+                                    <div class="project-card-head">
+                                        <div class="project-title">{{ project.title }}</div>
+                                        <div class="project-tech">
+                                            <span class="tech-tag" v-for="tag in splitTech(project.tech_stack)"
+                                                :key="tag">{{ tag
+                                                }}</span>
+                                        </div>
+                                    </div>
+                                    <p class="project-desc">
+                                        <span v-if="!isExpanded(project)">{{ project.description_short }}</span>
+                                        <span v-else>{{ project.description_full }}</span>
+                                    </p>
+                                    <div class="project-meta">
+                                        <span v-if="project.date" class="project-date">{{ formatDateShort(project.date)
+                                            }}</span>
+                                        <div class="project-actions">
+                                            <a v-if="project.demo_link" :href="project.demo_link" target="_blank"
+                                                rel="noopener noreferrer" class="btn-primary">View</a>
+                                            <button class="btn-toggle" @click="toggleExpand(project)">{{
+                                                isExpanded(project) ?
+                                                'Collapse' : 'Read more' }}</button>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ungrouped view (cards) -->
+                    <div v-else class="projects-cards">
+                        <article class="project-card" v-for="project in filteredAndSortedProjects" :key="project.title">
+                            <div class="project-card-head">
+                                <div class="project-title">{{ project.title }}</div>
+                                <div class="project-tech">
+                                    <span class="tech-tag" v-for="tag in splitTech(project.tech_stack)" :key="tag">{{
+                                        tag }}</span>
+                                </div>
+                            </div>
+                            <p class="project-desc">
+                                <span v-if="!isExpanded(project)">{{ truncate(project.description, 160) }}</span>
+                                <span v-else>{{ project.description }}</span>
+                            </p>
+                            <div class="project-meta">
+                                <span v-if="project.date" class="project-date">{{ formatDateShort(project.date)
+                                    }}</span>
+                                <div class="project-actions">
                                     <a v-if="project.demo_link" :href="project.demo_link" target="_blank"
-                                        rel="noopener noreferrer">View</a>
-                                    <span v-else>N/A</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                        rel="noopener noreferrer" class="btn-primary">View</a>
+                                    <button class="btn-toggle" @click="toggleExpand(project)">{{ isExpanded(project) ?
+                                        'Collapse' :
+                                        'Read more' }}</button>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div v-if="filteredAndSortedProjects.length === 0" class="no-results">
+                        No results found.
+                    </div>
                 </div>
+
 
                 <!-- Experiences Content -->
                 <div v-if="id === 'experiences'">
@@ -139,7 +203,6 @@
                 <!-- Contact Content -->
                 <div v-if="id === 'contact'">
                     <p><strong>Email:</strong> dot1mav@gmail.com</p>
-                    <p><strong>Phone:</strong> (+98) 917 169 8273</p>
                     <p><strong>GitHub:</strong> <a href="https://github.com/dot1mav" target="_blank"
                             rel="noopener noreferrer">github.com/dot1mav</a></p>
                     <p><strong>LinkedIn:</strong> <a href="https://ir.linkedin.com/in/dot1mav" target="_blank"
@@ -153,7 +216,6 @@
                     <h1>Mohammad Amin Vakili</h1>
                     <p>Software Developer</p>
                     <p><strong>Email:</strong> dot1mav@gmail.com</p>
-                    <p><strong>Phone:</strong> (+98) 917 169 8273</p>
                     <p><strong>Website:</strong> dot1mav.ir</p>
                     <p><strong>Address:</strong> Hormozgan, Bandar Abbas</p>
                     <p><strong>Birthdate:</strong> 1998-05-30</p>

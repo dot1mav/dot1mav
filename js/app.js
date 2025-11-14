@@ -4,13 +4,8 @@ const { createApp } = Vue;
 createApp({
   data() {
     return {
-      // Loading State
       isLoading: true,
-
-      // Dark Mode
       isDarkMode: false,
-
-      // Windows State
       windows: {
         projects: {
           open: false,
@@ -74,7 +69,6 @@ createApp({
         },
       },
 
-      // Drag State
       dragState: {
         isDragging: false,
         windowId: null,
@@ -82,10 +76,8 @@ createApp({
         startY: 0,
       },
 
-      // Current Time for Taskbar
       currentTime: "",
 
-      // Data from JSON
       projects: [],
       experiences: [],
       skills: {},
@@ -93,19 +85,17 @@ createApp({
       aboutText1: "",
       aboutText2: "",
       aboutText3: "",
-      isMobile: false, // Projects UI state
+      isMobile: false,
       projectsSearch: "",
       projectsTechFilter: "",
-      projectsSort: "date_desc", // پیش‌فرض: جدیدترین اول
+      projectsSort: "date_desc",
       groupByYear: true,
 
-      // track which projects expanded
-      expandedProjects: [], // array of titles or unique keys
+      expandedProjects: [],
     };
   },
 
   computed: {
-    // Get open windows for taskbar
     openTaskbarWindows() {
       const result = {};
       for (const [id, window] of Object.entries(this.windows)) {
@@ -114,7 +104,7 @@ createApp({
         }
       }
       return result;
-    }, // all available tech tags from projects
+    },
     allProjectTags() {
       const tags = new Set();
       (this.projects || []).forEach((p) => {
@@ -124,18 +114,15 @@ createApp({
       return Array.from(tags).sort();
     },
 
-    // filtered and sorted projects (ungrouped)
     filteredAndSortedProjects() {
       let list = (this.projects || []).slice();
 
-      // filter by tech tag if selected
       if (this.projectsTechFilter) {
         list = list.filter((p) =>
           this.splitTech(p.tech_stack).includes(this.projectsTechFilter)
         );
       }
 
-      // search: title, description, tech_stack
       const q = (this.projectsSearch || "").trim().toLowerCase();
       if (q) {
         list = list.filter((p) => {
@@ -147,13 +134,10 @@ createApp({
         });
       }
 
-      // parse date for sorting if exists (try multiple formats)
       const parseDate = (d) => {
         if (!d) return null;
-        // common YYYY or "Month YYYY - Month YYYY" etc. Try to extract a year or ISO
         const iso = Date.parse(d);
         if (!isNaN(iso)) return new Date(iso);
-        // fallback: find 4-digit year
         const m = d.match(/(19|20)\d{2}/);
         if (m) return new Date(parseInt(m[0], 10), 0, 1);
         return null;
@@ -163,7 +147,6 @@ createApp({
         p._parsedDate = parseDate(p.date || p.dates || null);
       });
 
-      // sorting
       switch (this.projectsSort) {
         case "title_asc":
           list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
@@ -191,7 +174,6 @@ createApp({
       return list;
     },
 
-    // grouped by year (object: { yearLabel: [projects...] })
     groupedProjects() {
       const groups = {};
 
@@ -225,51 +207,94 @@ createApp({
   },
 
   methods: {
-    // Window Management
+    sendUmamiEvent(name, data = {}) {
+      try {
+        if (!name) return;
+        const eventName = String(name).slice(0, 50);
+        console.log(
+          typeof window !== "undefined" && typeof window.umami !== "undefined"
+        );
+        console.log(window.umami);
+        if (
+          typeof window !== "undefined" &&
+          typeof window.umami !== "undefined"
+        ) {
+          if (data && Object.keys(data).length > 0) {
+            window.umami.track(eventName, data);
+          } else {
+            window.umami.track(eventName);
+          }
+        } else {
+        }
+      } catch (err) {}
+    },
+
     openWindow(id) {
       this.windows[id].open = true;
       this.windows[id].minimized = false;
+
+      this.sendUmamiEvent("window_open", {
+        window_id: id,
+        window_title: this.windows[id].title,
+      });
     },
 
     closeWindow(id) {
       this.windows[id].open = false;
       this.windows[id].minimized = false;
       this.windows[id].maximized = false;
+
+      this.sendUmamiEvent("window_close", {
+        window_id: id,
+        window_title: this.windows[id].title,
+      });
     },
 
     minimizeWindow(id) {
       this.windows[id].minimized = true;
+
+      this.sendUmamiEvent("window_minimize", {
+        window_id: id,
+        window_title: this.windows[id].title,
+      });
     },
 
     restoreWindow(id) {
       this.windows[id].minimized = false;
+
+      this.sendUmamiEvent("window_restore", {
+        window_id: id,
+        window_title: this.windows[id].title,
+      });
     },
 
     maximizeWindow(id) {
       const win = this.windows[id];
       win.maximized = !win.maximized;
       if (win.maximized) {
-        // save previous size/position
         win.prevX = win.x;
         win.prevY = win.y;
         win.prevWidth = win.width;
         win.prevHeight = win.height;
 
-        // set to full available viewport (leave taskbar height 28px)
         win.x = 0;
         win.y = 0;
         win.width = window.innerWidth;
         win.height = Math.max(window.innerHeight - 28, 200);
       } else {
-        // restore previous
         win.x = win.prevX !== undefined ? win.prevX : 100;
         win.y = win.prevY !== undefined ? win.prevY : 100;
         win.width = win.prevWidth !== undefined ? win.prevWidth : 500;
         win.height = win.prevHeight !== undefined ? win.prevHeight : 400;
       }
+
+      this.sendUmamiEvent("window_maximize_toggle", {
+        window_id: id,
+        window_title: win.title,
+        maximized: win.maximized,
+      });
     },
 
-    // Update Clock
     updateClock() {
       const now = new Date();
       this.currentTime = now.toLocaleTimeString("en-US", {
@@ -279,18 +304,17 @@ createApp({
       });
     },
 
-    // Dark Mode
     toggleDarkMode() {
       this.isDarkMode = !this.isDarkMode;
       document.body.classList.toggle("dark-mode");
-
-      // Save preference to localStorage
       localStorage.setItem("darkMode", this.isDarkMode);
+
+      this.sendUmamiEvent("dark_mode_toggle", {
+        enabled: this.isDarkMode,
+      });
     },
 
-    // Drag and Drop
     startDrag(e, id) {
-      // Don't drag if clicking on controls
       if (e.target.closest(".title-bar-controls")) return;
 
       e.preventDefault();
@@ -302,7 +326,6 @@ createApp({
         startY: e.clientY - this.windows[id].y,
       };
 
-      // Add event listeners
       document.addEventListener("mousemove", this.handleDrag);
       document.addEventListener("mouseup", this.stopDrag);
     },
@@ -311,18 +334,15 @@ createApp({
       if (this.dragState.isDragging && this.dragState.windowId) {
         const id = this.dragState.windowId;
 
-        // Calculate new position
         let newX = e.clientX - this.dragState.startX;
         let newY = e.clientY - this.dragState.startY;
 
-        // Keep window within viewport
         const maxX = window.innerWidth - 100;
         const maxY = window.innerHeight - 100;
 
         newX = Math.max(0, Math.min(newX, maxX));
         newY = Math.max(0, Math.min(newY, maxY));
 
-        // Update position
         this.windows[id].x = newX;
         this.windows[id].y = newY;
       }
@@ -332,13 +352,12 @@ createApp({
       this.dragState.isDragging = false;
       this.dragState.windowId = null;
 
-      // Remove event listeners
       document.removeEventListener("mousemove", this.handleDrag);
       document.removeEventListener("mouseup", this.stopDrag);
     },
 
     updateIsMobile() {
-      this.isMobile = window.innerWidth <= 480; // آستانه دلخواه: 480px (می‌تونی تغییر بدی)
+      this.isMobile = window.innerWidth <= 480;
     },
 
     splitTech(techString) {
@@ -349,14 +368,12 @@ createApp({
         .filter(Boolean);
     },
 
-    // truncate text
     truncate(text, limit = 160) {
       if (!text) return "";
       if (text.length <= limit) return text;
       return text.slice(0, limit).trim() + "…";
     },
 
-    // toggle expand state for a project
     isExpanded(project) {
       return this.expandedProjects.includes(project.title);
     },
@@ -368,22 +385,18 @@ createApp({
       else this.expandedProjects.splice(idx, 1);
     },
 
-    // format date to short (e.g., 2024 or Jun 2024)
     formatDateShort(raw) {
       if (!raw) return "";
       const iso = Date.parse(raw);
       if (!isNaN(iso)) {
         const d = new Date(iso);
-        // show 'YYYY' or 'Mon YYYY' if month exists
         const month = d.toLocaleString("en-US", { month: "short" });
         return `${month} ${d.getFullYear()}`;
       }
-      // fallback: extract year
       const m = (raw + "").match(/(19|20)\d{2}/);
       return m ? m[0] : raw;
     },
 
-    // Load Data from JSON
     async loadData() {
       try {
         const response = await fetch("data.json");
@@ -397,7 +410,6 @@ createApp({
         this.aboutText3 = data.aboutText3;
       } catch (error) {
         console.error("Error loading data:", error);
-        // Fallback data if fetch fails
         this.projects = [];
         this.experiences = [];
         this.skills = {};
@@ -408,23 +420,19 @@ createApp({
       }
     },
 
-    // Format Key for Skills
     formatKey(key) {
       return (
         key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, " $1")
       );
     },
 
-    // Initialize App
     initializeApp() {
-      // Load dark mode preference
       const savedDarkMode = localStorage.getItem("darkMode");
       if (savedDarkMode === "true") {
         this.isDarkMode = true;
         document.body.classList.add("dark-mode");
       }
 
-      // Adjust window positions for smaller screens
       if (window.innerWidth < 768) {
         Object.keys(this.windows).forEach((id, index) => {
           this.windows[id].x = 20;
@@ -440,7 +448,6 @@ createApp({
         });
       }
 
-      // Update clock every minute
       this.updateClock();
       setInterval(this.updateClock, 60000);
     },
@@ -509,6 +516,17 @@ createApp({
       const btnMax = win.querySelector('[data-action="max"]');
       const btnCloseAlt = win.querySelector('[data-action="close-btn"]');
 
+      const repoLink = win.querySelector(".notice-primary");
+      if (repoLink) {
+        repoLink.addEventListener("click", (e) => {
+          this.sendUmamiEvent("source_notice_repo_clicked", {
+            window_title: "Source Code Notice",
+            repo: "dot1mav/dot1mav",
+            branch: "gh-pages",
+          });
+        });
+      }
+
       const remove = () => {
         cleanup();
         if (backdrop && backdrop.parentNode)
@@ -561,7 +579,6 @@ createApp({
 
       backdrop.addEventListener("click", (e) => {
         if (e.target === backdrop) {
-          // remove(); // uncomment to allow outside click -> close
         }
       });
 
@@ -590,7 +607,6 @@ createApp({
         if (!dragging) return;
         let newLeft = ev.clientX - offsetX;
         let newTop = ev.clientY - offsetY;
-        // keep inside viewport
         newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - 100));
         newTop = Math.max(0, Math.min(newTop, window.innerHeight - 60));
         win.style.left = newLeft + "px";
@@ -629,6 +645,12 @@ createApp({
         const win = document.getElementById(cfg.windowId);
         if (win) win.style.zIndex = 100001;
       }, 0);
+
+      this.sendUmamiEvent("source_notice_shown", {
+        window_title: "Source Code Notice",
+        repo: "dot1mav/dot1mav",
+        branch: "gh-pages",
+      });
     },
 
     installSourceGuards() {
@@ -707,23 +729,16 @@ createApp({
   async mounted() {
     this.installSourceGuards();
 
-    // Load data first
     await this.loadData();
 
-    // Initialize app
     this.initializeApp();
 
-    // initial check
     this.updateIsMobile();
-    // listener برای تغییر اندازه
     window.addEventListener("resize", this.updateIsMobile);
 
-    // در beforeUnmount (یا قبل از حذف کامپوننت) listener رو پاک کن:
     window.removeEventListener("resize", this.updateIsMobile);
 
-    // Handle window resize
     window.addEventListener("resize", () => {
-      // Adjust window positions if they're off screen
       Object.keys(this.windows).forEach((id) => {
         if (this.windows[id].open && !this.windows[id].maximized) {
           const maxX = window.innerWidth - 100;
@@ -738,6 +753,26 @@ createApp({
         }
       });
     });
+
+    document.addEventListener(
+      "click",
+      (e) => {
+        const a = e.target.closest && e.target.closest("a.btn-primary");
+        if (!a) return;
+        const card = a.closest && a.closest(".project-card");
+        let projectTitle = null;
+        if (card) {
+          const titleEl =
+            card.querySelector && card.querySelector(".project-title");
+          if (titleEl) projectTitle = titleEl.innerText.trim();
+        }
+        this.sendUmamiEvent("project_demo_open", {
+          project_title: projectTitle || null,
+          demo: !!a.href,
+        });
+      },
+      { passive: true }
+    );
 
     console.log("MAV Portfolio loaded successfully! 🎉");
     console.log("Enjoy the Windows 98 nostalgia! 💾");

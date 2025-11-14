@@ -7,10 +7,10 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-family: "IBM Plex Sans" !important;
 }
 
 body {
-    font-family: 'MS Sans Serif', 'Tahoma', 'Arial', sans-serif;
     background: url('../images/background.jpg') no-repeat center center fixed;
     background-size: cover;
     overflow: hidden;
@@ -205,6 +205,7 @@ body.dark-mode {
     border-top: 1px solid var(--border-dark);
     overflow: auto;
     max-height: calc(100% - 18px);
+    font-size: 14px !important;
 }
 
 /* Projects Cards */
@@ -372,8 +373,8 @@ body.dark-mode {
 
 /* Profile Photo */
 .profile-photo {
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
     display: block;
     margin: 0 auto 10px;
@@ -567,5 +568,68 @@ header .header-body h2 {
         padding: 5px;
         font-size: 10px;
         height: calc(100%-18px)
+    }
+}
+
+.source-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.source-window {
+    z-index: 100001 !important;
+    min-width: 420px;
+    max-width: calc(100% - 40px);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.source-window .window-body {
+    padding: 12px;
+}
+
+.source-window .title-bar-text {
+    font-weight: 900;
+    font-size: 12px;
+}
+
+.source-window .notice-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.source-window .notice-primary {
+    display: inline-block;
+    padding: 7px 12px;
+    border-radius: 6px;
+    background: var(--table-header);
+    color: var(--table-header-text);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.source-window .notice-neutral {
+    display: inline-block;
+    padding: 7px 12px;
+    border-radius: 6px;
+    background: var(--button-face);
+    color: var(--text-color);
+    border: 1px solid var(--border-dark);
+    cursor: pointer;
+}
+
+/* responsive */
+@media (max-width: 520px) {
+    .source-window {
+        min-width: 320px;
+        width: 92%;
     }
 }

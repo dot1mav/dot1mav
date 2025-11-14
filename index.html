@@ -7,6 +7,13 @@
     <meta name="description" content="Mohammad Amin Vakili Portfolio - Software Engineer & Developer">
     <title>MAV Portfolio</title>
 
+    <!-- font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
+        rel="stylesheet">
+
     <!-- 98.css for Windows 98 styling -->
     <link rel="stylesheet" href="https://unpkg.com/98.css">
 
@@ -22,32 +29,32 @@
         <!-- Desktop -->
         <main class="desktop">
             <div class="icon" @click="openWindow('projects')" @dblclick="openWindow('projects')">
-                <img src="https://img.icons8.com/3d-fluency/94/code-file.png" alt="Projects">
+                <img src="images/icons/projects.png" alt="Projects">
                 <span>Projects</span>
             </div>
 
             <div class="icon" @click="openWindow('experiences')" @dblclick="openWindow('experiences')">
-                <img src="https://img.icons8.com/3d-fluency/94/briefcase.png" alt="Experiences">
+                <img src="images/icons/experiences.png" alt="Experiences">
                 <span>Experiences</span>
             </div>
 
             <div class="icon" @click="openWindow('skills')" @dblclick="openWindow('skills')">
-                <img src="https://img.icons8.com/3d-fluency/94/settings.png" alt="Skills">
+                <img src="images/icons/skills.png" alt="Skills">
                 <span>Skills</span>
             </div>
 
             <div class="icon" @click="openWindow('certifications')" @dblclick="openWindow('certifications')">
-                <img src="https://img.icons8.com/3d-fluency/94/certificate.png" alt="Certifications">
+                <img src="images/icons/certificates.png" alt="Certifications">
                 <span>Certifications</span>
             </div>
 
             <div class="icon" @click="openWindow('contact')" @dblclick="openWindow('contact')">
-                <img src="https://img.icons8.com/3d-fluency/94/user-male.png" alt="Contact">
+                <img src="images/icons/contact.png" alt="Contact">
                 <span>Contact</span>
             </div>
 
             <div class="icon" @click="openWindow('about')" @dblclick="openWindow('about')">
-                <img src="https://img.icons8.com/3d-fluency/94/info.png" alt="About">
+                <img src="images/icons/info.png" alt="About">
                 <span>About</span>
             </div>
         </main>
@@ -212,7 +219,7 @@
 
                 <!-- About Content -->
                 <div v-if="id === 'about'">
-                    <img src="images/photo.jpg" alt="Mohammad Amin Vakili" class="profile-photo">
+                    <img src="images/self.jpg" alt="Mohammad Amin Vakili" class="profile-photo">
                     <h1>Mohammad Amin Vakili</h1>
                     <p>Software Developer</p>
                     <p><strong>Email:</strong> dot1mav@gmail.com</p>

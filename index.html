@@ -19,11 +19,14 @@
 
     <!-- Custom Styles -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style-enhanced.css">
+    <link rel="stylesheet" href="css/extra-effects.css">
 
     <!-- Favicon -->
     <link rel="icon" href="https://img.icons8.com/3d-fluency/94/computer.png" type="image/png">
 
-    <script defer src="https://cloud.umami.is/script.js" data-website-id="f1fcf1fc-9414-4a1d-ab0e-26d38c123dcb"></script>
+    <script defer src="https://cloud.umami.is/script.js"
+        data-website-id="f1fcf1fc-9414-4a1d-ab0e-26d38c123dcb"></script>
 </head>
 
 <body>
@@ -59,6 +62,11 @@
                 <img src="images/icons/info.png" alt="About">
                 <span>About</span>
             </div>
+
+            <div class="icon" @click="downloadResume" style="display: none !important;">
+                <img src="https://img.icons8.com/3d-fluency/94/download.png" alt="Download Resume">
+                <span>Resume</span>
+            </div>
         </main>
 
         <!-- Loading Window -->
@@ -91,7 +99,7 @@
                 </div>
             </div>
             <div class="window-body">
-                <!-- Projects Content (responsive cards with search, filter, sort, group) -->
+                <!-- Projects Content -->
                 <div v-if="id === 'projects'">
                     <div class="projects-controls">
                         <input v-model="projectsSearch" type="search"
@@ -122,8 +130,7 @@
                                         <div class="project-title">{{ project.title }}</div>
                                         <div class="project-tech">
                                             <span class="tech-tag" v-for="tag in splitTech(project.tech_stack)"
-                                                :key="tag">{{ tag
-                                                }}</span>
+                                                :key="tag">{{ tag }}</span>
                                         </div>
                                     </div>
                                     <p class="project-desc">
@@ -137,8 +144,7 @@
                                             <a v-if="project.demo_link" :href="project.demo_link" target="_blank"
                                                 rel="noopener noreferrer" class="btn-primary">View</a>
                                             <button class="btn-toggle" @click="toggleExpand(project)">{{
-                                                isExpanded(project) ?
-                                                'Collapse' : 'Read more' }}</button>
+                                                isExpanded(project) ? 'Collapse' : 'Read more' }}</button>
                                         </div>
                                     </div>
                                 </article>
@@ -146,7 +152,7 @@
                         </div>
                     </div>
 
-                    <!-- ungrouped view (cards) -->
+                    <!-- ungrouped view -->
                     <div v-else class="projects-cards">
                         <article class="project-card" v-for="project in filteredAndSortedProjects" :key="project.title">
                             <div class="project-card-head">
@@ -157,8 +163,8 @@
                                 </div>
                             </div>
                             <p class="project-desc">
-                                <span v-if="!isExpanded(project)">{{ truncate(project.description, 160) }}</span>
-                                <span v-else>{{ project.description }}</span>
+                                <span v-if="!isExpanded(project)">{{ project.description_short }}</span>
+                                <span v-else>{{ project.description_full }}</span>
                             </p>
                             <div class="project-meta">
                                 <span v-if="project.date" class="project-date">{{ formatDateShort(project.date)
@@ -167,8 +173,7 @@
                                     <a v-if="project.demo_link" :href="project.demo_link" target="_blank"
                                         rel="noopener noreferrer" class="btn-primary">View</a>
                                     <button class="btn-toggle" @click="toggleExpand(project)">{{ isExpanded(project) ?
-                                        'Collapse' :
-                                        'Read more' }}</button>
+                                        'Collapse' : 'Read more' }}</button>
                                 </div>
                             </div>
                         </article>
@@ -178,7 +183,6 @@
                         No results found.
                     </div>
                 </div>
-
 
                 <!-- Experiences Content -->
                 <div v-if="id === 'experiences'">
@@ -192,20 +196,117 @@
                     </div>
                 </div>
 
-                <!-- Certifications Content -->
-                <div v-if="id === 'certifications'">
-                    <ul>
-                        <li v-for="cert in certifications" :key="cert.name">
-                            <strong>{{ cert.name }}</strong> - {{ cert.issuer }} ({{ cert.date }})
-                            <a v-if="cert.link" :href="cert.link" target="_blank" rel="noopener noreferrer">Link</a>
-                        </li>
-                    </ul>
+                <!-- Skills Content - Enhanced -->
+                <div v-if="id === 'skills'">
+                    <div class="section-header">
+                        <span class="section-header-icon">💻</span>
+                        <h2 class="section-header-title">Technical Skills</h2>
+                    </div>
+
+                    <div class="skills-grid">
+                        <div class="skill-card">
+                            <div class="skill-card-header">
+                                <span class="skill-icon">🎨</span>
+                                <h3 class="skill-card-title">Frontend</h3>
+                            </div>
+                            <div class="skill-tags">
+                                <span class="skill-tag" v-for="skill in splitSkills(skills.frontend)" :key="skill">
+                                    {{ skill }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="skill-card">
+                            <div class="skill-card-header">
+                                <span class="skill-icon">⚙️</span>
+                                <h3 class="skill-card-title">Backend</h3>
+                            </div>
+                            <div class="skill-tags">
+                                <span class="skill-tag" v-for="skill in splitSkills(skills.backend)" :key="skill">
+                                    {{ skill }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="skill-card">
+                            <div class="skill-card-header">
+                                <span class="skill-icon">🗄️</span>
+                                <h3 class="skill-card-title">Database</h3>
+                            </div>
+                            <div class="skill-tags">
+                                <span class="skill-tag" v-for="skill in splitSkills(skills.database)" :key="skill">
+                                    {{ skill }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="skill-card">
+                            <div class="skill-card-header">
+                                <span class="skill-icon">🛠️</span>
+                                <h3 class="skill-card-title">Tools</h3>
+                            </div>
+                            <div class="skill-tags">
+                                <span class="skill-tag" v-for="skill in splitSkills(skills.tools)" :key="skill">
+                                    {{ skill }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="skill-card" v-if="skills.cloud">
+                            <div class="skill-card-header">
+                                <span class="skill-icon">☁️</span>
+                                <h3 class="skill-card-title">Cloud</h3>
+                            </div>
+                            <div class="skill-tags">
+                                <span class="skill-tag" v-for="skill in splitSkills(skills.cloud)" :key="skill">
+                                    {{ skill }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="skill-card" v-if="skills.other">
+                            <div class="skill-card-header">
+                                <span class="skill-icon">🔧</span>
+                                <h3 class="skill-card-title">Other</h3>
+                            </div>
+                            <div class="skill-tags">
+                                <span class="skill-tag" v-for="skill in splitSkills(skills.other)" :key="skill">
+                                    {{ skill }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Skills Content -->
-                <div v-if="id === 'skills'">
-                    <div v-for="(value, key) in skills" :key="key" class="skill-category">
-                        <strong>{{ formatKey(key) }}:</strong> {{ value }}
+                <!-- Certifications Content - Enhanced -->
+                <div v-if="id === 'certifications'">
+                    <div class="section-header">
+                        <span class="section-header-icon">🏆</span>
+                        <h2 class="section-header-title">Certifications & Licenses</h2>
+                    </div>
+
+                    <div v-if="certifications && certifications.length > 0" class="certifications-grid">
+                        <div class="cert-card" v-for="(cert, index) in certifications" :key="index">
+                            <div class="cert-card-header">
+                                <div class="cert-icon">🎓</div>
+                                <div class="cert-content">
+                                    <h3 class="cert-name">{{ cert.name }}</h3>
+                                    <p class="cert-issuer">{{ cert.issuer }}</p>
+                                    <p class="cert-date" v-if="cert.date">{{ cert.date }}</p>
+                                </div>
+                            </div>
+                            <div class="cert-actions" v-if="cert.link">
+                                <a :href="cert.link" target="_blank" rel="noopener noreferrer" class="cert-link">
+                                    <span>📄</span>
+                                    <span>View Certificate</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-else class="empty-state">
+                        <div class="empty-state-icon">📜</div>
+                        <p class="empty-state-text">No certifications available</p>
                     </div>
                 </div>
 
@@ -265,6 +366,8 @@
 
     <!-- Custom JavaScript -->
     <script src="js/app.js"></script>
+    <script src="js/particle-effects.js"></script>
+    <script src="js/custom-cursor.js"></script>
 </body>
 
 </html>

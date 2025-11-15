@@ -34,8 +34,8 @@ createApp({
           title: "Skills",
           x: 140,
           y: 140,
-          width: 500,
-          height: 360,
+          width: 600,
+          height: 460,
         },
         certifications: {
           open: false,
@@ -44,8 +44,8 @@ createApp({
           title: "Certifications",
           x: 160,
           y: 160,
-          width: 500,
-          height: 360,
+          width: 700,
+          height: 460,
         },
         contact: {
           open: false,
@@ -128,7 +128,10 @@ createApp({
         list = list.filter((p) => {
           return (
             (p.title && p.title.toLowerCase().includes(q)) ||
-            (p.description && p.description.toLowerCase().includes(q)) ||
+            (p.description_short &&
+              p.description_short.toLowerCase().includes(q)) ||
+            (p.description_full &&
+              p.description_full.toLowerCase().includes(q)) ||
             (p.tech_stack && p.tech_stack.toLowerCase().includes(q))
           );
         });
@@ -368,6 +371,14 @@ createApp({
         .filter(Boolean);
     },
 
+    splitSkills(skillsString) {
+      if (!skillsString) return [];
+      return skillsString
+        .split(/\s*[,]\s*/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+    },
+
     truncate(text, limit = 160) {
       if (!text) return "";
       if (text.length <= limit) return text;
@@ -395,6 +406,22 @@ createApp({
       }
       const m = (raw + "").match(/(19|20)\d{2}/);
       return m ? m[0] : raw;
+    },
+
+    downloadResume() {
+      const resumeUrl = "resume.pdf";
+
+      const link = document.createElement("a");
+      link.href = resumeUrl;
+      link.download = "Mohammad_Amin_Vakili_Resume.pdf";
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      this.sendUmamiEvent("resume_download", {
+        file_name: "Mohammad_Amin_Vakili_Resume.pdf",
+      });
     },
 
     async loadData() {
@@ -485,7 +512,7 @@ createApp({
 
       win.innerHTML = `
     <div class="title-bar" aria-label="Source notice titlebar">
-      <div class="title-bar-text">MAV Portfolio — Source</div>
+      <div class="title-bar-text">MAV Portfolio – Source</div>
       <div class="title-bar-controls">
         <button data-action="min" aria-label="Minimize"></button>
         <button data-action="max" aria-label="Maximize"></button>
@@ -493,7 +520,7 @@ createApp({
       </div>
     </div>
     <div class="window-body">
-      <h3 style="margin:0 0 8px;font-size:15px;font-weight:800;">Heads up — Source available</h3>
+      <h3 style="margin:0 0 8px;font-size:15px;font-weight:800;">Heads up – Source available</h3>
       <p style="margin:0 0 10px;line-height:1.4;">
         The frontend code for this site is public on GitHub. View, fork or contribute via the repository and the <code>gh-pages</code> branch.
       </p>

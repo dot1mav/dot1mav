@@ -20,6 +20,13 @@
   --text: #000000;
   --link: #0000ee;
   --link-visited: #551a8b;
+  --border-light: #ffffff;
+  --border-dark: #808080;
+  --border-darkest: #000000;
+  --button-face: #c0c0c0;
+  --button-shadow: #808080;
+  --button-highlight: #ffffff;
+  --text-color: #000000;
 }
 
 body.dark-mode {
@@ -28,6 +35,13 @@ body.dark-mode {
   --silver: #808080;
   --gray: #404040;
   --text: #000000;
+  --border-light: #c0c0c0;
+  --border-dark: #404040;
+  --border-darkest: #000000;
+  --button-face: #808080;
+  --button-shadow: #404040;
+  --button-highlight: #c0c0c0;
+  --text-color: #000000;
 }
 
 /* ===== Base ===== */
@@ -40,14 +54,15 @@ body {
   background: var(--teal);
   overflow: hidden;
   touch-action: pan-x pan-y;
+  cursor: none;
 }
+body * { cursor: none; }
 a { color: var(--link); }
 a:visited { color: var(--link-visited); }
 
 /* ===== Scrollbars ===== */
 ::-webkit-scrollbar { width: 16px; height: 16px; }
 ::-webkit-scrollbar-track {
-  background: repeating-comb(var(--silver));
   background: var(--silver);
   border: 1px solid var(--gray);
 }

@@ -26,7 +26,7 @@ defineProps({
   },
 })
 
-defineEmits(['open'])
+const emit = defineEmits(['open'])
 
 const selected = ref(false)
 

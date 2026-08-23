@@ -14,7 +14,7 @@ export function useSourceGuards() {
   const { sendUmamiEvent } = useAnalytics()
 
   const cfg = () => ({
-    enableSourceGuards: true,
+    enableSourceGuards: false,
     githubUrl: 'https://github.com/dot1mav/dot1mav/tree/gh-pages',
     backdropId: 'source-backdrop',
     windowId: 'source-window',

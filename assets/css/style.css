@@ -71,13 +71,7 @@ a:visited { color: var(--link-visited); }
   border: 2px outset var(--silver);
 }
 ::-webkit-scrollbar-thumb:hover { background: #d4d4d4; }
-::-webkit-scrollbar-button {
-  display: block;
-  width: 16px;
-  height: 16px;
-  background: var(--silver);
-  border: 2px outset var(--silver);
-}
+::-webkit-scrollbar-button { display: none; }
 
 /* ===== Focus ===== */
 *:focus-visible {
@@ -235,7 +229,7 @@ a:visited { color: var(--link-visited); }
 /* ===== Window Body ===== */
 .window-body {
   background: var(--win-body);
-  padding: 8px;
+  padding: 4px 6px;
   height: calc(100% - 20px);
   overflow: auto;
   font-size: 12px;
@@ -350,6 +344,10 @@ a:visited { color: var(--link-visited); }
   height: 22px;
 }
 #start-btn:active { border-style: inset; }
+#start-btn.active {
+  border-style: inset;
+  background: #b0b0b0;
+}
 
 .start-flag {
   display: inline-grid;

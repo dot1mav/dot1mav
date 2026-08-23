@@ -1,6 +1,6 @@
 <template>
   <div id="taskbar" role="navigation" aria-label="Taskbar">
-    <button id="start-btn" @click="toggleStartMenu" aria-label="Start Menu">
+    <button id="start-btn" :class="{ active: showStartMenu }" @click="toggleStartMenu" aria-label="Start Menu">
       <span class="start-flag">
         <span class="sf-r"></span><span class="sf-g"></span>
         <span class="sf-b"></span><span class="sf-y"></span>

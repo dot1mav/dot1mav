@@ -11,12 +11,12 @@
                 <span class="win-b"></span><span class="win-y"></span>
               </div>
             </div>
-            <div class="boot-title">Microsoft<sup style="font-size:9px">®</sup> Windows<sup style="font-size:9px">®</sup> 98</div>
+            <div class="boot-title">dot1mav Portfolio OS</div>
           </div>
           <div class="boot-progress">
             <div class="boot-progress-bar"></div>
           </div>
-          <div class="boot-text">Starting Windows 98...</div>
+          <div class="boot-text">dot1mav Portfolio OS is loading...</div>
         </div>
       </div>
     </Transition>

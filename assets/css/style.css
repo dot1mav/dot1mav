@@ -230,6 +230,7 @@ a:visited { color: var(--link-visited); }
 .window-body {
   background: var(--win-body);
   padding: 4px 6px;
+  margin: 0;
   height: calc(100% - 20px);
   overflow: auto;
   font-size: 12px;
@@ -1019,33 +1020,150 @@ body.cursor-click .cursor-outline { width: 48px; height: 48px; }
   .icon { min-width: 44px; min-height: 44px; }
   .title-bar-controls button { width: 20px; height: 18px; }
   .btn-primary, .btn-toggle, .btn-detail { min-height: 36px; padding: 8px 14px; }
+  .gallery-nav { width: 36px; height: 36px; font-size: 16px; }
 }
 
+/* Tablet */
 @media (max-width: 768px) {
-  .desktop { padding: 10px; gap: 6px; }
+  .desktop {
+    padding: 8px;
+    gap: 6px;
+    height: calc(100vh - 28px);
+  }
+
   .icon { width: 64px; }
   .icon img { width: 28px; height: 28px; }
   .icon .icon-label, .icon > span { font-size: 10px; }
-  .window { min-width: 200px; max-width: calc(100vw - 12px); }
-  .window-body { padding: 6px; font-size: 11px; }
-  .skills-grid { grid-template-columns: 1fr; }
-  .certifications-grid { grid-template-columns: 1fr; }
-  .projects-cards { grid-template-columns: 1fr; }
-}
 
-@media (max-width: 480px) {
-  .desktop { padding: 6px; }
-  .icon { width: 56px; }
-  .icon img { width: 24px; height: 24px; }
-  .icon .icon-label, .icon > span { font-size: 9px; }
-  .window { min-width: 160px; max-width: calc(100vw - 8px); }
-  .window-body { padding: 4px; font-size: 10px; }
-  .title-bar { font-size: 10px; }
-  #taskbar { height: 26px; }
-  #taskbar-copyright { display: none; }
-  .skill-card, .cert-card { padding: 8px; }
+  .window {
+    min-width: 0;
+    max-width: calc(100vw - 12px);
+  }
+
+  .window-body {
+    padding: 4px;
+    font-size: 11px;
+  }
+
+  .title-bar { height: 18px; }
+  .title-bar-text { font-size: 10px; }
+
+  .projects-cards { grid-template-columns: 1fr; gap: 6px; }
+  .skills-grid { grid-template-columns: 1fr; gap: 6px; }
+  .certifications-grid { grid-template-columns: 1fr; gap: 6px; }
+
+  .project-card { padding: 6px; min-height: 0; }
+  .project-title { font-size: 12px; }
+  .project-desc { font-size: 11px; }
+  .tech-tag { font-size: 9px; padding: 1px 4px; }
+
+  .skill-card { padding: 6px; }
+  .skill-card-title { font-size: 11px; }
+  .skill-tag { font-size: 10px; padding: 2px 6px; }
+
+  .cert-card { padding: 8px; }
   .cert-card-header { flex-direction: column; }
   .cert-icon { width: 32px; height: 32px; font-size: 16px; }
+  .cert-name { font-size: 12px; }
+
+  .experience-item { padding: 6px 8px; }
+  .experience-item h3 { font-size: 12px; }
+  .experience-item ul { font-size: 11px; }
+
+  .detail-image-frame { min-height: 120px; height: 180px; }
+  .detail-title { font-size: 14px; }
+  .detail-description { font-size: 11px; }
+
+  .section-header { margin-bottom: 6px; padding-bottom: 4px; }
+  .section-header-title { font-size: 13px; }
+  .group-title { font-size: 13px; }
+
+  .projects-controls { gap: 4px; margin-bottom: 6px; }
+  .projects-controls select { font-size: 10px; }
+
+  #taskbar { height: 28px; }
+  #taskbar-copyright { display: none; }
+}
+
+/* Phone */
+@media (max-width: 480px) {
+  .desktop {
+    padding: 4px;
+    gap: 4px;
+    height: calc(100vh - 26px);
+  }
+
+  .icon { width: 56px; padding: 2px; }
+  .icon img { width: 24px; height: 24px; }
+  .icon .icon-label, .icon > span { font-size: 9px; }
+
+  .window {
+    min-width: 0;
+    max-width: calc(100vw - 8px);
+  }
+
+  .window-body {
+    padding: 3px;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  .title-bar { height: 16px; padding: 0 2px; }
+  .title-bar-text { font-size: 9px; }
+  .title-bar-controls button { width: 14px; height: 12px; font-size: 7px; }
+
+  .project-card { padding: 4px; gap: 3px; }
+  .project-title { font-size: 11px; }
+  .project-desc { font-size: 10px; }
+  .project-date { font-size: 9px; }
+  .tech-tag { font-size: 8px; padding: 1px 3px; }
+  .project-actions { gap: 3px; }
+  .btn-primary, .btn-toggle, .btn-detail {
+    font-size: 9px;
+    padding: 3px 6px;
+  }
+
+  .skill-card { padding: 4px; }
+  .skill-card-header { margin-bottom: 4px; padding-bottom: 3px; gap: 4px; }
+  .skill-card-title { font-size: 10px; }
+  .skill-tag { font-size: 9px; padding: 2px 4px; }
+
+  .cert-card { padding: 6px; }
+  .cert-name { font-size: 11px; }
+  .cert-issuer, .cert-date { font-size: 10px; }
+  .cert-link { font-size: 10px; padding: 3px 8px; }
+
+  .experience-item { padding: 4px 6px; margin-bottom: 6px; }
+  .experience-item h3 { font-size: 11px; }
+  .experience-item ul { font-size: 10px; margin-left: 14px; }
+
+  .detail-image-frame { min-height: 100px; height: 140px; }
+  .detail-title { font-size: 13px; }
+  .detail-date { font-size: 10px; }
+  .detail-description { font-size: 10px; }
+  .detail-features ul { font-size: 10px; }
+  .detail-links { gap: 4px; }
+  .gallery-thumb { width: 40px; height: 30px; }
+
+  .section-header { gap: 4px; margin-bottom: 4px; }
+  .section-header-icon { font-size: 14px; }
+  .section-header-title { font-size: 12px; }
+  .group-title { font-size: 12px; margin-bottom: 4px; }
+
+  .projects-controls { flex-direction: column; align-items: stretch; }
+  .projects-controls input[type="search"] { flex: 1; }
+  .group-toggle { font-size: 10px; }
+
+  .start-menu { min-width: 160px; }
+  .start-menu-item { padding: 4px 8px; font-size: 10px; }
+
+  #taskbar { height: 26px; padding: 1px 3px; gap: 2px; }
+  #taskbar-buttons button { font-size: 10px; padding: 1px 5px; max-width: 100px; }
+  #taskbar-clock { font-size: 10px; padding: 1px 4px; }
+  #start-btn { padding: 1px 4px; font-size: 10px; height: 20px; }
+  #dark-mode-toggle { font-size: 10px; height: 18px; }
+
+  .profile-photo { width: 80px; height: 80px; }
 }
 
 /* ===== Mobile cursor disable ===== */

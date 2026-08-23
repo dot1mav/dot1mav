@@ -274,11 +274,11 @@ export function useWindows() {
   // desktop coordinates, which would overflow sideways otherwise.
   function layoutWindowsForMobile() {
     if (typeof window === 'undefined' || window.innerWidth >= 768) return
-    Object.keys(windows).forEach((id, index) => {
-      windows[id].x = 20
-      windows[id].y = 50 + index * 40
-      windows[id].width = Math.min(windows[id].width, window.innerWidth - 40)
-      windows[id].height = Math.min(windows[id].height, window.innerHeight - 100)
+    Object.keys(windows).forEach((id) => {
+      windows[id].x = 4
+      windows[id].y = 4
+      windows[id].width = window.innerWidth - 16
+      windows[id].height = window.innerHeight - 40
     })
   }
 

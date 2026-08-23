@@ -1,8 +1,12 @@
 <template>
   <div class="terminal" @click="handleTerminalClick">
-    <!-- MS-DOS title bar (blue, like the real thing) -->
+    <!-- Title bar - classic Win98 MS-DOS blue -->
     <div class="terminal-header">
       <div class="terminal-header-left">
+        <span class="terminal-icon">⬛</span>
+        <span class="terminal-header-title">MS-DOS Prompt</span>
+      </div>
+      <div class="terminal-header-right">
         <button type="button" class="t-menu-btn" :class="{ active: terminalMenu === 'file' }"
           @click.stop="toggleTerminalMenu('file')">File</button>
         <button type="button" class="t-menu-btn" :class="{ active: terminalMenu === 'edit' }"
@@ -10,7 +14,6 @@
         <button type="button" class="t-menu-btn" :class="{ active: terminalMenu === 'help' }"
           @click.stop="toggleTerminalMenu('help')">Help</button>
       </div>
-      <span class="terminal-header-title">MS-DOS Prompt</span>
     </div>
 
     <!-- Dropdown menus -->
@@ -21,17 +24,17 @@
       </ul>
       <ul v-else-if="terminalMenu === 'edit'" class="terminal-menu">
         <li><button type="button" class="terminal-menu-item"
-            @click="terminalMenu = null; clearTerminal()">Clear</button></li>
+            @click="terminalMenu = null; clearTerminal()">Clear Screen</button></li>
         <li><button type="button" class="terminal-menu-item"
-            @click="terminalMenu = null; copyTerminalOutput()">Copy output</button></li>
+            @click="terminalMenu = null; copyTerminalOutput()">Copy</button></li>
       </ul>
       <ul v-else-if="terminalMenu === 'help'" class="terminal-menu">
         <li><button type="button" class="terminal-menu-item"
-            @click="terminalMenu = null; printAbout()">About Terminal</button></li>
+            @click="terminalMenu = null; printAbout()">About</button></li>
       </ul>
     </div>
 
-    <!-- Terminal output (scrolling region) -->
+    <!-- Terminal output -->
     <div class="terminal-output" ref="terminalOutputEl" role="log" aria-live="polite" aria-label="Terminal output">
       <div v-for="(line, index) in terminalLines" :key="index" :class="['t-line', line.type]">
         <a v-if="line.type === 'link'" class="t-link" :href="line.href" target="_blank"
@@ -46,8 +49,8 @@
       <input ref="terminalInputEl" v-model="terminalInput" type="text" autocomplete="off"
         spellcheck="false" aria-label="Terminal input" @keydown="onTerminalKeydown"
         :style="{ width: terminalInputWidth }" />
-      <span class="t-caret"></span>
-      <span class="t-hint">Tab=autocomplete  ↑↓=history  F1=help</span>
+      <span class="t-cursor"></span>
+      <span class="t-hint">Tab autocomplete | ↑↓ history | F1 help</span>
     </div>
   </div>
 </template>
@@ -74,7 +77,7 @@ const {
 </script>
 
 <style scoped>
-/* Authentic MS-DOS Prompt styling */
+/* ---- Authentic MS-DOS Prompt ---- */
 .terminal {
   position: relative;
   height: 100%;
@@ -82,40 +85,49 @@ const {
   flex-direction: column;
   min-height: 0;
   background: #000;
-  color: #c0c0c0;
+  color: #aaa;
   font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', monospace !important;
-  font-size: 14px;
-  line-height: 1.3;
+  font-size: 13px;
+  line-height: 1.4;
   overflow: hidden;
-  border: 2px solid;
-  border-color: #808080 #fff #fff #808080;
 }
 
-/* Menu bar - classic blue gradient */
+/* ---- Header bar ---- */
 .terminal-header {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  background: linear-gradient(90deg, #000080, #1084d0);
+  background: #000080;
   color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 4px;
-  border-bottom: 1px solid #000040;
+  padding: 1px 3px;
   user-select: none;
+  height: 20px;
+  min-height: 20px;
 }
 
 .terminal-header-left {
   display: flex;
-  gap: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.terminal-icon {
+  font-size: 10px;
+  line-height: 1;
 }
 
 .terminal-header-title {
-  letter-spacing: 0.5px;
-  opacity: 0.95;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #fff;
   font-style: italic;
+}
+
+.terminal-header-right {
+  display: flex;
+  gap: 1px;
 }
 
 .t-menu-btn {
@@ -124,19 +136,19 @@ const {
   color: #fff;
   font-family: 'MS Sans Serif', Tahoma, sans-serif;
   font-size: 11px;
-  font-weight: 400;
-  padding: 1px 6px;
+  padding: 0 5px;
   cursor: pointer;
-  line-height: 1.4;
+  line-height: 18px;
+  height: 18px;
 }
 
 .t-menu-btn:hover,
 .t-menu-btn.active {
-  background: rgba(255, 255, 255, 0.15);
-  outline: 1px dotted #fff;
-  outline-offset: -2px;
+  background: #fff;
+  color: #000080;
 }
 
+/* ---- Dropdown ---- */
 .terminal-menus {
   position: relative;
   height: 0;
@@ -145,9 +157,9 @@ const {
 
 .terminal-menu {
   position: absolute;
-  top: 4px;
-  left: 4px;
-  min-width: 170px;
+  top: 0;
+  left: 0;
+  min-width: 160px;
   list-style: none;
   margin: 0;
   padding: 2px;
@@ -156,7 +168,7 @@ const {
   border-left: 1px solid #fff;
   border-bottom: 1px solid #000;
   border-right: 1px solid #000;
-  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
 
 .terminal-menu-item {
@@ -165,11 +177,12 @@ const {
   text-align: left;
   background: transparent;
   border: none;
-  padding: 3px 12px;
+  padding: 2px 12px;
   font-family: 'MS Sans Serif', Tahoma, sans-serif;
   font-size: 12px;
   color: #000;
   cursor: pointer;
+  line-height: 18px;
 }
 
 .terminal-menu-item:hover {
@@ -177,21 +190,22 @@ const {
   color: #fff;
 }
 
-/* Output area */
+/* ---- Output area ---- */
 .terminal-output {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 8px 10px;
+  padding: 6px 8px;
   white-space: pre-wrap;
   word-break: break-word;
   user-select: text;
   -webkit-user-select: text;
+  background: #000;
 }
 
 .terminal-output::-webkit-scrollbar {
-  width: 16px;
+  width: 14px;
 }
 
 .terminal-output::-webkit-scrollbar-track {
@@ -200,12 +214,12 @@ const {
 }
 
 .terminal-output::-webkit-scrollbar-thumb {
-  background: #555;
+  background: #444;
   border: 2px solid #000;
 }
 
 .terminal-output::-webkit-scrollbar-thumb:hover {
-  background: #777;
+  background: #666;
 }
 
 .terminal ::selection {
@@ -213,63 +227,61 @@ const {
   color: #fff;
 }
 
-/* Line types */
+/* ---- Line types ---- */
 .t-line {
   min-height: 1.3em;
 }
 
 .t-cmd {
   color: #fff;
-  font-weight: 700;
 }
 
 .t-out {
-  color: #c0c0c0;
+  color: #aaa;
 }
 
 .t-info {
-  color: #00d7ff;
+  color: #5ff;  /* light cyan */
 }
 
 .t-success {
-  color: #55ff55;
+  color: #5f5;  /* light green */
 }
 
 .t-err {
-  color: #ff5555;
+  color: #f55;  /* light red */
 }
 
 .t-accent {
-  color: #ffff55;
-  font-weight: 700;
+  color: #ff5;  /* light yellow */
 }
 
 .t-link {
-  color: #5599ff;
+  color: #55f;
   text-decoration: underline;
   cursor: pointer;
 }
 
 .t-link:hover {
-  color: #99ccff;
-  background: rgba(0, 80, 180, 0.4);
+  color: #99f;
+  background: rgba(0, 60, 255, 0.25);
 }
 
-/* Input line */
+/* ---- Input line ---- */
 .terminal-input-line {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 0;
-  padding: 6px 10px 8px;
-  border-top: 1px solid #333;
-  background: #0a0a0a;
-  min-height: 30px;
+  padding: 4px 8px 6px;
+  background: #000;
+  border-top: 1px solid #222;
+  min-height: 26px;
   overflow: hidden;
 }
 
 .t-prompt {
-  color: #c0c0c0;
+  color: #aaa;
   font-weight: 700;
   white-space: nowrap;
   user-select: none;
@@ -284,44 +296,45 @@ const {
   outline: none;
   color: #fff;
   font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', monospace !important;
-  font-size: 14px;
+  font-size: 13px;
   padding: 0;
   caret-color: transparent;
   overflow: hidden;
   text-overflow: clip;
 }
 
-.t-caret {
+.t-cursor {
   display: inline-block;
   flex: 0 0 auto;
-  width: 8px;
-  height: 15px;
-  background: #c0c0c0;
-  animation: t-blink 1s steps(1) infinite;
+  width: 7px;
+  height: 13px;
+  background: #aaa;
+  animation: blink 1s steps(1) infinite;
   margin-left: 1px;
+  vertical-align: middle;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
 }
 
 .t-hint {
   margin-left: auto;
-  color: #555;
-  font-size: 10px;
+  color: #444;
+  font-size: 9px;
   white-space: nowrap;
   user-select: none;
   font-family: 'MS Sans Serif', Tahoma, sans-serif;
 }
 
-@keyframes t-blink {
-  50% { opacity: 0; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .t-caret { animation: none; }
+  .t-cursor { animation: none; }
 }
 
 @media (max-width: 480px) {
-  .terminal { font-size: 12px; }
-  .terminal-input-line input { font-size: 12px; }
-  .t-caret { width: 6px; height: 12px; }
+  .terminal { font-size: 11px; }
+  .terminal-input-line input { font-size: 11px; }
+  .t-cursor { width: 5px; height: 10px; }
   .t-hint { display: none; }
 }
 </style>

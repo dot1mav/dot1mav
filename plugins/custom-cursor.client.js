@@ -1,104 +1,137 @@
 // ================================================
 // Custom Cursor (client-only)
+// Smooth dot + ring + trailing glow
 // ================================================
 
 class CustomCursor {
   constructor() {
     this.dot = null
-    this.outline = null
+    this.ring = null
+    this.glow = null
     this.mouseX = 0
     this.mouseY = 0
     this.dotX = 0
     this.dotY = 0
-    this.outlineX = 0
-    this.outlineY = 0
+    this.ringX = 0
+    this.ringY = 0
+    this.glowX = 0
+    this.glowY = 0
+    this.visible = false
+    this.hovering = false
+    this.clicking = false
+    this.raf = null
     this.init()
   }
 
   init() {
-    // Check if on mobile or prefers reduced motion
-    if (
-      window.innerWidth <= 768 ||
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
-    }
+    if (window.innerWidth <= 768 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    // Create cursor elements
     this.dot = document.createElement('div')
     this.dot.className = 'cursor-dot'
     document.body.appendChild(this.dot)
 
-    this.outline = document.createElement('div')
-    this.outline.className = 'cursor-outline'
-    document.body.appendChild(this.outline)
+    this.ring = document.createElement('div')
+    this.ring.className = 'cursor-ring'
+    document.body.appendChild(this.ring)
 
-    // Track mouse movement
+    this.glow = document.createElement('div')
+    this.glow.className = 'cursor-glow'
+    document.body.appendChild(this.glow)
+
     document.addEventListener('mousemove', (e) => {
       this.mouseX = e.clientX
       this.mouseY = e.clientY
+      if (!this.visible) {
+        this.visible = true
+        this.dotX = this.ringX = this.glowX = e.clientX
+        this.dotY = this.ringY = this.glowY = e.clientY
+        this.dot.classList.add('cursor-visible')
+        this.ring.classList.add('cursor-visible')
+        this.glow.classList.add('cursor-visible')
+      }
     })
 
-    // Hover effects on interactive elements
-    const interactiveElements =
-      'a, button, .icon, .skill-tag, .tech-tag, .project-card, .cert-card, input, select, .btn-primary, .btn-toggle, .title-bar-controls button'
+    document.addEventListener('mouseleave', () => {
+      this.visible = false
+      this.dot.classList.remove('cursor-visible')
+      this.ring.classList.remove('cursor-visible')
+      this.glow.classList.remove('cursor-visible')
+    })
+
+    document.addEventListener('mouseenter', () => {
+      this.visible = true
+      this.dot.classList.add('cursor-visible')
+      this.ring.classList.add('cursor-visible')
+      this.glow.classList.add('cursor-visible')
+    })
+
+    const interactive = 'a, button, .icon, .skill-tag, .tech-tag, .project-card, .cert-card, input, select, .btn-primary, .btn-toggle, .title-bar-controls button, .gallery-nav, .group-toggle'
 
     document.addEventListener('mouseover', (e) => {
-      if (
-        e.target.matches(interactiveElements) ||
-        e.target.closest(interactiveElements)
-      ) {
+      if (e.target.matches(interactive) || e.target.closest(interactive)) {
+        this.hovering = true
         document.body.classList.add('cursor-hover')
       }
     })
 
     document.addEventListener('mouseout', (e) => {
-      if (
-        e.target.matches(interactiveElements) ||
-        e.target.closest(interactiveElements)
-      ) {
+      if (e.target.matches(interactive) || e.target.closest(interactive)) {
+        this.hovering = false
         document.body.classList.remove('cursor-hover')
       }
     })
 
-    // Click effect
     document.addEventListener('mousedown', () => {
+      this.clicking = true
       document.body.classList.add('cursor-click')
     })
 
     document.addEventListener('mouseup', () => {
+      this.clicking = false
       document.body.classList.remove('cursor-click')
     })
 
-    // Animate cursor
     this.animate()
   }
 
   animate() {
-    if (document.hidden) {
-      requestAnimationFrame(() => this.animate())
-      return
-    }
+    this.raf = requestAnimationFrame(() => this.animate())
 
-    // Smooth follow for dot (faster)
-    this.dotX += (this.mouseX - this.dotX) * 0.25
-    this.dotY += (this.mouseY - this.dotY) * 0.25
+    if (document.hidden) return
 
-    // Smooth follow for outline (slower)
-    this.outlineX += (this.mouseX - this.outlineX) * 0.15
-    this.outlineY += (this.mouseY - this.outlineY) * 0.15
+    const ease = (a, b, t) => a + (b - a) * t
+
+    // Dot: snappy follow
+    this.dotX = ease(this.dotX, this.mouseX, 0.35)
+    this.dotY = ease(this.dotY, this.mouseY, 0.35)
+
+    // Ring: smooth follow
+    this.ringX = ease(this.ringX, this.mouseX, 0.18)
+    this.ringY = ease(this.ringY, this.mouseY, 0.18)
+
+    // Glow: slowest, ambient feel
+    this.glowX = ease(this.glowX, this.mouseX, 0.08)
+    this.glowY = ease(this.glowY, this.mouseY, 0.08)
 
     if (this.dot) {
       this.dot.style.left = this.dotX + 'px'
       this.dot.style.top = this.dotY + 'px'
     }
-
-    if (this.outline) {
-      this.outline.style.left = this.outlineX + 'px'
-      this.outline.style.top = this.outlineY + 'px'
+    if (this.ring) {
+      this.ring.style.left = this.ringX + 'px'
+      this.ring.style.top = this.ringY + 'px'
     }
+    if (this.glow) {
+      this.glow.style.left = this.glowX + 'px'
+      this.glow.style.top = this.glowY + 'px'
+    }
+  }
 
-    requestAnimationFrame(() => this.animate())
+  destroy() {
+    if (this.raf) cancelAnimationFrame(this.raf)
+    this.dot?.remove()
+    this.ring?.remove()
+    this.glow?.remove()
   }
 }
 

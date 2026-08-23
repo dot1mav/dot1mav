@@ -921,33 +921,77 @@ select {
 /* ===================================================
    CUSTOM CURSOR
    =================================================== */
-.cursor-dot {
+.cursor-dot,
+.cursor-ring,
+.cursor-glow {
   position: fixed;
   top: 0; left: 0;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  will-change: left, top;
+}
+.cursor-dot.cursor-visible,
+.cursor-ring.cursor-visible,
+.cursor-glow.cursor-visible { opacity: 1; }
+
+/* Inner dot */
+.cursor-dot {
   width: 6px; height: 6px;
   background: var(--white);
   border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  transform: translate(-50%, -50%);
-  transition: width 0.15s, height 0.15s;
   mix-blend-mode: difference;
+  transition: width 0.2s ease, height 0.2s ease, opacity 0.15s ease;
+  z-index: 10002;
 }
-.cursor-outline {
-  position: fixed;
-  top: 0; left: 0;
-  width: 24px; height: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+
+/* Outer ring */
+.cursor-ring {
+  width: 28px; height: 28px;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
   border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  transform: translate(-50%, -50%);
-  transition: width 0.2s, height 0.2s, border-color 0.2s;
+  transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease, opacity 0.15s ease;
+  z-index: 10001;
 }
-body.cursor-hover .cursor-dot { width: 12px; height: 12px; }
-body.cursor-hover .cursor-outline { width: 36px; height: 36px; border-color: rgba(255, 255, 255, 0.8); }
-body.cursor-click .cursor-dot { width: 4px; height: 4px; }
-body.cursor-click .cursor-outline { width: 48px; height: 48px; }
+
+/* Glow trail */
+.cursor-glow {
+  width: 60px; height: 60px;
+  background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+  border-radius: 50%;
+  transition: width 0.3s ease, height 0.3s ease, opacity 0.15s ease;
+  z-index: 10000;
+}
+
+/* Hover state */
+body.cursor-hover .cursor-dot {
+  width: 10px; height: 10px;
+  background: var(--accent);
+}
+body.cursor-hover .cursor-ring {
+  width: 40px; height: 40px;
+  border-color: rgba(255, 255, 255, 0.7);
+  border-width: 2px;
+}
+body.cursor-hover .cursor-glow {
+  width: 80px; height: 80px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+}
+
+/* Click state */
+body.cursor-click .cursor-dot {
+  width: 4px; height: 4px;
+  opacity: 0.7;
+}
+body.cursor-click .cursor-ring {
+  width: 22px; height: 22px;
+  border-color: rgba(255, 255, 255, 0.9);
+  border-width: 2px;
+}
+body.cursor-click .cursor-glow {
+  width: 40px; height: 40px;
+}
 
 /* ===== Canvas layers ===== */
 #particle-canvas,
@@ -1169,7 +1213,7 @@ body.cursor-click .cursor-outline { width: 48px; height: 48px; }
 /* ===== Mobile cursor disable ===== */
 @media (max-width: 768px) {
   body, body * { cursor: auto !important; }
-  .cursor-dot, .cursor-outline { display: none !important; }
+  .cursor-dot, .cursor-ring, .cursor-glow { display: none !important; }
 }
 
 /* ===== Reduced Motion ===== */
@@ -1179,6 +1223,6 @@ body.cursor-click .cursor-outline { width: 48px; height: 48px; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .cursor-dot, .cursor-outline,
+  .cursor-dot, .cursor-ring, .cursor-glow,
   #particle-canvas, #cursor-canvas, #ripple-canvas { display: none !important; }
 }

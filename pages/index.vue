@@ -7,7 +7,7 @@
           <div class="boot-header">
             <span class="boot-header-title">MAV Portfolio OS v1.0</span>
           </div>
-          <div class="boot-output">
+          <div class="boot-output" ref="bootOutputEl">
             <div v-for="(line, i) in bootLines" :key="i" :class="['boot-line', line.type]">
               {{ line.text }}
             </div>
@@ -50,13 +50,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useWindows } from '../composables/useWindows'
 import { useApp } from '../composables/useApp'
 import { useSourceGuards } from '../composables/useSourceGuards'
 
 const booting = ref(true)
 const bootLines = ref([])
+const bootOutputEl = ref(null)
 
 const {
   windows,
@@ -121,12 +122,21 @@ const BOOT_SCRIPT = [
   { text: '', type: 'dim', delay: 100 },
 ]
 
+function scrollToBottom() {
+  nextTick(() => {
+    if (bootOutputEl.value) {
+      bootOutputEl.value.scrollTop = bootOutputEl.value.scrollHeight
+    }
+  })
+}
+
 function runBootSequence() {
   let totalDelay = 0
   BOOT_SCRIPT.forEach((item) => {
     totalDelay += item.delay
     setTimeout(() => {
       bootLines.value.push({ text: item.text, type: item.type })
+      scrollToBottom()
     }, totalDelay)
   })
   // After all lines printed, wait a moment then finish
@@ -188,7 +198,7 @@ onBeforeUnmount(() => {
 
 .boot-output {
   max-height: 70vh;
-  overflow-y: auto;
+  overflow: hidden;
   padding: 0 2px;
 }
 

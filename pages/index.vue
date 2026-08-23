@@ -1,22 +1,18 @@
 <template>
   <div id="app">
-    <!-- Win98 Boot Screen -->
+    <!-- Terminal Boot Sequence -->
     <Transition name="boot-fade">
       <div v-if="booting" class="boot-screen">
-        <div class="boot-content">
-          <div class="boot-logo">
-            <div class="boot-windows-logo">
-              <div class="win-flag">
-                <span class="win-r"></span><span class="win-g"></span>
-                <span class="win-b"></span><span class="win-y"></span>
-              </div>
+        <div class="boot-terminal">
+          <div class="boot-header">
+            <span class="boot-header-title">MAV Portfolio OS v1.0</span>
+          </div>
+          <div class="boot-output">
+            <div v-for="(line, i) in bootLines" :key="i" :class="['boot-line', line.type]">
+              {{ line.text }}
             </div>
-            <div class="boot-title">dot1mav Portfolio OS</div>
+            <span v-if="booting" class="boot-cursor">█</span>
           </div>
-          <div class="boot-progress">
-            <div class="boot-progress-bar"></div>
-          </div>
-          <div class="boot-text">dot1mav Portfolio OS is loading...</div>
         </div>
       </div>
     </Transition>
@@ -60,6 +56,7 @@ import { useApp } from '../composables/useApp'
 import { useSourceGuards } from '../composables/useSourceGuards'
 
 const booting = ref(true)
+const bootLines = ref([])
 
 const {
   windows,
@@ -74,7 +71,6 @@ const { install: installSourceGuards, remove: removeSourceGuards } = useSourceGu
 
 const windowIds = Object.keys(windows)
 
-// Order here is the order they appear on the desktop, left to right.
 const desktopIcons = [
   { id: 'projects', icon: '/images/icons/projects.png', label: 'Projects' },
   { id: 'experiences', icon: '/images/icons/experiences.png', label: 'Experiences' },
@@ -88,8 +84,52 @@ const desktopIcons = [
   { id: 'video', icon: '/images/icons/video.png', label: 'Video Player' },
 ]
 
-onMounted(() => {
-  // Win98 boot sequence
+const BOOT_SCRIPT = [
+  { text: 'MAV Portfolio OS v1.0 [Build 2026.08.23]', type: 'info', delay: 80 },
+  { text: 'Copyright (c) 2026 dot1mav. All rights reserved.', type: 'dim', delay: 60 },
+  { text: '', type: 'dim', delay: 40 },
+  { text: 'BIOS Date: 08/23/2026  Ver: 1.0.4', type: 'dim', delay: 70 },
+  { text: 'Detecting hardware...', type: 'out', delay: 200 },
+  { text: '  CPU: Software Engineer v3.0 @ max效能', type: 'dim', delay: 120 },
+  { text: '  RAM: 640K (ought to be enough)', type: 'dim', delay: 100 },
+  { text: '  GPU: Creativity Engine (RTX vibes)', type: 'dim', delay: 90 },
+  { text: '', type: 'dim', delay: 50 },
+  { text: 'Loading system modules...', type: 'out', delay: 180 },
+  { text: '  [OK] DOM Manipulator v3.2.1', type: 'ok', delay: 100 },
+  { text: '  [OK] CSS Renderer (Win98 mode)', type: 'ok', delay: 90 },
+  { text: '  [OK] Keyboard Handler v1.4.0', type: 'ok', delay: 80 },
+  { text: '  [OK] Window Manager (draggable)', type: 'ok', delay: 85 },
+  { text: '', type: 'dim', delay: 40 },
+  { text: 'Connecting to portfolio API...', type: 'out', delay: 250 },
+  { text: '  GET /api/data ...', type: 'info', delay: 300 },
+  { text: '  >> 200 OK (18.4 KB)', type: 'ok', delay: 150 },
+  { text: '', type: 'dim', delay: 40 },
+  { text: 'Fetching projects...', type: 'out', delay: 200 },
+  { text: '  >> 12 projects loaded', type: 'ok', delay: 130 },
+  { text: '  >> 6 skills categories loaded', type: 'ok', delay: 100 },
+  { text: '  >> 3 experiences loaded', type: 'ok', delay: 90 },
+  { text: '  >> 5 certifications loaded', type: 'ok', delay: 85 },
+  { text: '  >> Contact info loaded', type: 'ok', delay: 80 },
+  { text: '', type: 'dim', delay: 40 },
+  { text: 'Initializing desktop environment...', type: 'out', delay: 200 },
+  { text: '  [OK] Windows 98 theme loaded', type: 'ok', delay: 100 },
+  { text: '  [OK] Custom cursor initialized', type: 'ok', delay: 90 },
+  { text: '  [OK] Particle effects ready', type: 'ok', delay: 85 },
+  { text: '  [OK] Dark mode preference set', type: 'ok', delay: 80 },
+  { text: '', type: 'dim', delay: 40 },
+  { text: 'All systems nominal. Launching desktop...', type: 'accent', delay: 300 },
+  { text: '', type: 'dim', delay: 100 },
+]
+
+function runBootSequence() {
+  let totalDelay = 0
+  BOOT_SCRIPT.forEach((item) => {
+    totalDelay += item.delay
+    setTimeout(() => {
+      bootLines.value.push({ text: item.text, type: item.type })
+    }, totalDelay)
+  })
+  // After all lines printed, wait a moment then finish
   setTimeout(() => {
     booting.value = false
     installSourceGuards()
@@ -97,7 +137,11 @@ onMounted(() => {
     layoutWindowsForMobile()
     installKeyboardShortcuts()
     window.addEventListener('resize', handleWindowResize)
-  }, 2200)
+  }, totalDelay + 400)
+}
+
+onMounted(() => {
+  runBootSequence()
 })
 
 onBeforeUnmount(() => {
@@ -108,85 +152,79 @@ onBeforeUnmount(() => {
 </script>
 
 <style>
-/* ===== Win98 Boot Screen ===== */
+/* ===== Terminal Boot Screen ===== */
 .boot-screen {
   position: fixed;
   inset: 0;
-  background: #000080;
+  background: #000;
   z-index: 999999;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
 }
 
-.boot-content {
-  text-align: center;
+.boot-terminal {
+  width: 100%;
+  max-width: 600px;
+  background: #000;
+  font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.boot-header {
+  background: #000080;
+  color: #fff;
+  padding: 2px 6px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.boot-header-title {
   color: #fff;
 }
 
-.boot-logo {
-  margin-bottom: 40px;
+.boot-output {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 0 2px;
 }
 
-.boot-windows-logo {
-  margin-bottom: 16px;
+.boot-line {
+  min-height: 1.4em;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
-.win-flag {
-  display: inline-grid;
-  grid-template-columns: 18px 18px;
-  grid-template-rows: 18px 18px;
-  gap: 3px;
-  transform: skewX(-8deg);
+.boot-line.info { color: #5ff; }
+.boot-line.dim { color: #555; }
+.boot-line.out { color: #aaa; }
+.boot-line.ok { color: #5f5; }
+.boot-line.accent { color: #ff5; }
+
+.boot-cursor {
+  color: #aaa;
+  animation: boot-blink 0.6s steps(1) infinite;
 }
 
-.win-r { background: #ff0000; border-radius: 2px; }
-.win-g { background: #00aa00; border-radius: 2px; }
-.win-b { background: #0000ff; border-radius: 2px; }
-.win-y { background: #ffcc00; border-radius: 2px; }
-
-.boot-title {
-  font-family: 'Times New Roman', Times, serif;
-  font-size: 28px;
-  font-weight: 400;
-  letter-spacing: 1px;
-}
-
-.boot-progress {
-  width: 260px;
-  height: 18px;
-  margin: 0 auto 12px;
-  background: #000;
-  border: 2px solid #808080;
-  padding: 2px;
-}
-
-.boot-progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #000080, #0000cc, #000080);
-  animation: boot-load 2s ease-in-out;
-  border-radius: 1px;
-}
-
-@keyframes boot-load {
-  0% { width: 0%; }
-  20% { width: 15%; }
-  40% { width: 35%; }
-  60% { width: 60%; }
-  80% { width: 85%; }
-  100% { width: 100%; }
-}
-
-.boot-text {
-  font-family: 'MS Sans Serif', Tahoma, sans-serif;
-  font-size: 12px;
-  color: #c0c0c0;
+@keyframes boot-blink {
+  50% { opacity: 0; }
 }
 
 .boot-fade-leave-active {
-  transition: opacity 0.4s ease;
+  transition: opacity 0.5s ease;
 }
 .boot-fade-leave-to {
   opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot-cursor { animation: none; }
+}
+
+@media (max-width: 480px) {
+  .boot-terminal { font-size: 11px; }
 }
 </style>

@@ -4,8 +4,7 @@
     role="button"
     :aria-label="`Open ${label}`"
     tabindex="0"
-    @click="select"
-    @dblclick="$emit('open')"
+    @click="handleClick"
     @keydown.enter="$emit('open')"
   >
     <img :src="icon" :alt="label">
@@ -31,10 +30,12 @@ defineEmits(['open'])
 
 const selected = ref(false)
 
-function select() {
+function handleClick() {
   selected.value = true
-  // Deselect after a short delay
-  setTimeout(() => { selected.value = false }, 600)
+  setTimeout(() => {
+    selected.value = false
+    emit('open')
+  }, 150)
 }
 </script>
 

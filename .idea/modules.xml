@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/dot1mav-portfolio-backend.iml" filepath="$PROJECT_DIR$/.idea/dot1mav-portfolio-backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../dot1mav-portfolio-frontend/.idea/dot1mav-portfolio-frontend.iml" filepath="$PROJECT_DIR$/../dot1mav-portfolio-frontend/.idea/dot1mav-portfolio-frontend.iml" />
+    </modules>
+  </component>
+</project>

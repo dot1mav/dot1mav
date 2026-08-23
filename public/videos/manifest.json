@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Test Patterns (demo clip)",
+    "src": "/videos/projects/demo-patterns.mp4",
+    "project": null,
+    "description": "Built-in demo clip — add your project videos to this folder and list them here."
+  },
+  {
+    "title": "Fractal Zoom (demo clip)",
+    "src": "/videos/projects/demo-fractal.mp4",
+    "project": null,
+    "description": "Built-in demo clip."
+  }
+]

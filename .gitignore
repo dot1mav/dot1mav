@@ -42,6 +42,7 @@ lerna-debug.log*
 dist/
 build/
 .output/
+.nuxt/
 
 # Dependency directories (if you add npm later)
 node_modules/

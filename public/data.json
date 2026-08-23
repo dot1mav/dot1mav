@@ -1,0 +1,408 @@
+{
+    "basics": {
+        "name": "Mohammad Amin Vakili",
+        "label": "Software Engineer / Developer",
+        "email": "dot1mav@gmail.com",
+        "phone": "",
+        "website": "http://dot1mav.ir",
+        "summary": "I'm a software engineer experienced in building web and desktop systems, process automation, IoT data integration, backend services, and data-driven applications. I specialize in Python, Django, Flask, Vue.js, Electron.js, database design, server management, and system optimization.",
+        "location": {
+            "address": "Bandar Abbas, Hormozgan, Iran",
+            "postalCode": "",
+            "city": "Bandar Abbas",
+            "countryCode": "IR",
+            "region": "Hormozgan"
+        },
+        "profiles": [
+            {
+                "network": "Website",
+                "username": "dot1mav",
+                "url": "http://dot1mav.ir"
+            },
+            {
+                "network": "Telegram",
+                "username": "dot1mav",
+                "url": "https://t.me/dot1mav"
+            }
+        ],
+        "birthDate": "1377/03/09",
+        "maritalStatus": "Single",
+        "militaryStatus": "Conscript"
+    },
+    "aboutText1": "Hello! I'm Mohammad Amin Vakili, a software engineer with hands-on experience in automation, backend development, and server-side engineering.",
+    "aboutText2": "I work with Python, Django, Flask, Vue.js, Electron.js, and databases like MariaDB and PostgreSQL. I have designed internal portals, backend services, IoT data pipelines, and real-time processing systems.",
+    "aboutText3": "I'm passionate about building efficient systems, contributing to open-source, managing servers, and applying modern backend technologies to solve real problems.",
+    "experiences": [
+        {
+            "title": "IT Expert",
+            "company": "Nab Entrepreneurship Club",
+            "location": "Bandar Abbas, Iran",
+            "dates": "July 2024 – December 2024",
+            "duties": [
+                "Designed and deployed organizational networks and integrated infrastructure.",
+                "Configured MikroTik routers including routing, VPN, firewall, and monitoring.",
+                "Created Python automation tools for internal workflows and data processing.",
+                "Performed web scraping for marketing and customer behavior analysis.",
+                "Built BI dashboards in Grafana connected to CRM datasets.",
+                "Developed a Django-based internal portal for workflows and process management.",
+                "Integrated the portal with Grafana for dynamic data visualization.",
+                "Managed MariaDB and PostgreSQL databases, including optimization and backup.",
+                "Evaluated software solutions and provided internal technical consulting.",
+                "Handled system monitoring, incident response, and server-side troubleshooting."
+            ]
+        },
+        {
+            "title": "IT Expert",
+            "company": "Laziz",
+            "location": "Bandar Abbas, Iran",
+            "dates": "June 2023 – September 2023",
+            "duties": [
+                "Monitored system health and resolved software/hardware issues.",
+                "Assisted in selecting and deploying internal organizational software.",
+                "Managed configuration and debugging of internal applications.",
+                "Evaluated proposed software and provided technical recommendations."
+            ]
+        },
+        {
+            "title": "Server Programmer",
+            "company": "Hormoz IoT Innovative Engineers",
+            "location": "Bandar Abbas, Iran",
+            "dates": "November 2020 – Present",
+            "duties": [
+                "Developed server-side APIs using Flask with modular and secure structures.",
+                "Managed Ubuntu servers including deployment, monitoring, and hardening.",
+                "Built backend services for IoT systems focused on data ingestion and processing.",
+                "Created a custom multithreaded Python Message Broker for high-volume data pipelines.",
+                "Optimized communication architecture to reduce message latency.",
+                "Implemented logging, monitoring, and automated server-side processes.",
+                "Managed existing services, optimized them, and added new services based on operational needs.",
+                "Deployed and ran Message Broker on Linux servers to provide stable performance for foundation projects.",
+                "Redesigned critical parts of Python and threading structure to optimize internal communication architecture and reduce message processing delays."
+            ]
+        },
+        {
+            "title": "Programmer",
+            "company": "Tafifti",
+            "location": "Bandar Abbas, Iran",
+            "dates": "April 2020 – November 2020",
+            "duties": [
+                "Contributed to software projects including automation tools and internal systems."
+            ]
+        },
+        {
+            "title": "Programmer",
+            "company": "Dade Kavan Sialk",
+            "location": "Bandar Abbas, Iran",
+            "dates": "September 2020 – Present",
+            "duties": [
+                "Developed backend integrations using Python and Requests.",
+                "Created multi-platform desktop applications using Electron.js + Vue.js.",
+                "Handled POS device integrations and secure transaction workflows.",
+                "Converted legacy desktop tools into lightweight web-based applications using Flask.",
+                "Designed and developed frontend with Vue.js including component design, state management, and interactive user interfaces.",
+                "Designed and developed databases with MariaDB including table modeling, query optimization, and data structures.",
+                "Analyzed large datasets (millions of rows in Excel), processed and visualized results for management decision-making."
+            ]
+        },
+        {
+            "title": "R&D / Developer",
+            "company": "Ivan Rayan",
+            "location": "Bandar Abbas, Iran",
+            "dates": "July 2017 – November 2018",
+            "duties": [
+                "Worked on backend/frontend development, data modeling, and analytics tools."
+            ]
+        },
+        {
+            "title": "Network Technician",
+            "company": "General Technical",
+            "location": "Bandar Abbas, Iran",
+            "dates": "July 2017 – September 2017",
+            "duties": [
+                "Performed network maintenance and technical support."
+            ]
+        }
+    ],
+    "projects": [
+        {
+            "title": "Industrial Data Handler",
+            "tech_stack": "OPC UA, Python, Flask, Excel",
+            "description_short": "Real-time industrial data logging and analysis system.",
+            "description_full": "Developed server-side system for receiving and processing real-time data from industrial PLCs. Worked with OPC UA protocol to establish communication, read variables, manage sessions, and monitor device status. Built a web-based application with Flask and Python for online log display, data filtering, and real-time system monitoring. Designed Excel output capability in different time bases for engineering reports and technical analysis. Designed and optimized data storage structure and created dedicated APIs for access to historical logs and data. Deployed the system on Linux environment and configured infrastructure to ensure stable performance under high data volume conditions.",
+            "date": "May 2025",
+            "features": [
+                "Real-time OPC UA communication with industrial PLCs",
+                "Web panel for live log display and filtering",
+                "Excel export in multiple time bases for engineering reports",
+                "Optimized storage and dedicated APIs for historical data"
+            ],
+            "images": [
+                "/images/projects/industrial-data-handler.svg",
+                "/images/background.jpg"
+            ]
+        },
+        {
+            "title": "Production Automation Portal",
+            "tech_stack": "Django, MariaDB, Grafana",
+            "description_short": "Internal portal for workflows and reporting.",
+            "description_full": "Designed and developed a complete automation system for production planning and existing inventory management including production formula control, raw material management, and finished product cost calculation. Defined and managed multi-level BOM (Bill of Materials) for complex products and production processes. Managed operators with shift-based operation reporting capability considering performance, response time, and mechanical and time limitations. Developed comprehensive reporting system including operator performance, material consumption, production needs, and inventory forecasting. Developed forms and request management with checklist definition capability for workers with specific tolerance and logistics limitations. Backend developed with Django and frontend with Django Templates using MariaDB for data storage. Used a combination of ORM and direct Query to optimize performance and reduce time risk in critical processes. Ensured stable performance and system development capability to respond to organizational operational needs.",
+            "date": "May 2025",
+            "features": [
+                "Multi-level BOM management for complex products",
+                "Shift-based operator reporting with performance tracking",
+                "Production needs and inventory forecasting reports",
+                "Request forms with checklist definitions"
+            ],
+            "images": [
+                "/images/projects/production-automation-portal.svg",
+                "/images/background.jpg"
+            ]
+        },
+        {
+            "title": "Balooch Publishing Website",
+            "tech_stack": "WordPress, Elementor, PHP",
+            "description_short": "Custom publishing platform.",
+            "description_full": "Designed and developed a fully custom website for Balooch Publications using WordPress with complete custom template design. Built graphical structure and unique user experience with Elementor and developed custom sections needed for publishing. Created easy management capabilities for books, categories, and publishing content with custom templates and dedicated features. Optimized site speed, security, and structure for stable and expandable performance. Implemented responsive design for correct display on mobile, tablet, and desktop.",
+            "date": "May 2025",
+            "images": [
+                "/images/projects/balooch-publishing-website.svg"
+            ]
+        },
+        {
+            "title": "VAS Marketplace",
+            "tech_stack": "WordPress",
+            "description_short": "Online marketplace site.",
+            "description_full": "Developed an e-commerce website using WordPress",
+            "date": "April 2025",
+            "demo_link": "https://vas-market.com",
+            "images": [
+                "/images/projects/vas-marketplace.svg"
+            ]
+        },
+        {
+            "title": "Mardomnegar Publishing Website",
+            "tech_stack": "WordPress, Elementor, PHP",
+            "description_short": "Publishing and content platform.",
+            "description_full": "Designed and developed a dedicated e-commerce website for Mardomnegar Publications using WordPress with ready-made template. Customized different sections of the site with PHP and Elementor to adapt to e-commerce needs and optimal user experience. Created easy management capabilities for products, categories, inventory, and orders in an integrated and efficient way. Optimized site design for responsive display on mobile, tablet, and desktop. Developed e-commerce features and user interaction with focus on management ease and customer experience. Link: https://mardomnegar.info",
+            "date": "February 2024",
+            "demo_link": "https://mardomnegar.info",
+            "images": [
+                "/images/projects/mardomnegar-publishing-website.svg"
+            ]
+        },
+        {
+            "title": "Meter Data Logging System",
+            "tech_stack": "Python, MQTT, Flask",
+            "description_short": "Real-time meter data processing backend.",
+            "description_full": "Measured incoming water volume to pump via Delta PLC and transferred data to HMI for display and control. Communicated HMI with MQTT Broker to send several specific registers over dedicated MQTT channels to Python server. Developed Python program to receive data, log, and manage information flow. Designed and developed a web-based panel with Flask for online viewing of logs and register status. Ensured accurate data processing, real-time logging, and user-friendly display of information for operational and control units.",
+            "date": "December 2023",
+            "features": [
+                "Water volume measurement via Delta PLC and HMI",
+                "MQTT-based register communication to Python server",
+                "Real-time logging and web panel for register status"
+            ],
+            "images": [
+                "/images/projects/meter-data-logging-system.svg"
+            ]
+        },
+        {
+            "title": "Debt Collection System",
+            "tech_stack": "Flask, Nuxt.js, Cronjob",
+            "description_short": "Payment tracking and automation.",
+            "description_full": "Developed a system to connect to accounting software for managing individual debts in the organization. Created personal link generation capability for viewing individual debt and sending dedicated link to user. Developed debt payment capability with attention to debts and automatic registration of payments in accounting software. Designed comprehensive reporting system for successful and failed payments for financial management and analysis. Backend developed with Python and Flask and frontend with Nuxt.js for fast and interactive user experience. Built communication architecture with accounting software via dedicated API using Cronjob for automatic data updates and processing. Ensured security, transaction correctness, and data compatibility with existing financial systems in the organization.",
+            "date": "December 2023",
+            "features": [
+                "Personal payment links for debt settlement",
+                "Automatic payment registration in accounting software",
+                "Success/failure reporting for financial management"
+            ],
+            "images": [
+                "/images/projects/debt-collection-system.svg"
+            ]
+        },
+        {
+            "title": "Shared Space Management Software",
+            "tech_stack": "Django, jQuery, Bootstrap",
+            "description_short": "Co-working space management system.",
+            "description_full": "Developed a web-based software for managing user membership and subscription renewals. Enabled online user registration and membership confirmation via website. Developed features for room and workshop reservations, session scheduling with time and access management for users. Designed responsive user interface using Bootstrap and jQuery for optimal user experience. Backend developed with Django including data management, form validation, and processing of user transactions. Ensured stable performance and correct management of user information and system development capability for the future.",
+            "date": "Not specified",
+            "images": [
+                "/images/projects/shared-space-management-software.svg"
+            ]
+        },
+        {
+            "title": "Ticket Purchase Software",
+            "tech_stack": "Electron.js, Vue.js, Python, API",
+            "description_short": "Cross-platform ticketing system.",
+            "description_full": "Developed a cross-platform desktop software with Electron.js and Vue.js for selecting services and processing user purchases. Connected to website API for receiving information and data synchronization between software and central database. Developed payment process via POS device and registered transactions securely and stably. Issued digital tickets after successful payment and managed order status. Backend with Python and Requests library for communication with API and processing user data and transactions. Ensured stable payment processing, data correctness, and smooth user experience in desktop environment.",
+            "date": "April 2022",
+            "images": [
+                "/images/projects/ticket-purchase-software.svg"
+            ]
+        },
+        {
+            "title": "Ticket Purchase Software (School Environment)",
+            "tech_stack": "POS, Electron.js, Vue.js, Python",
+            "description_short": "Ticket purchasing with POS device integration.",
+            "description_full": "Ticket purchase software from kiosk (complete communication with POS devices for fee payment).",
+            "date": "September 2022",
+            "images": [
+                "/images/projects/ticket-purchase-software-school-environment.svg"
+            ]
+        },
+        {
+            "title": "Insurance Management Panel",
+            "tech_stack": "Tkinter, Flask, pandas",
+            "description_short": "Insurance management and reporting system.",
+            "description_full": "Old version: Developed desktop software for reading Excel file differences and creating graphical user interface with Tkinter and using pandas. New version: Converted desktop software to web version using Flask and Bootstrap adding insurance policy and installment management capabilities. Enabled receiving installment file from Delphi software and bank payment file for automatic registration and processing. Developed installment payment announcement process via Kavenegar API by sending SMS to policyholders with Mellat Bank payment ID. Designed responsive user interface and data management to optimize information processing and user experience. Ensured data correctness, accurate transaction registration, and reduced human errors in insurance financial processing.",
+            "date": "June 2022",
+            "images": [
+                "/images/projects/insurance-management-panel.svg"
+            ]
+        },
+        {
+            "title": "Message Broker for Capital System Module Management",
+            "tech_stack": "Python, Threading",
+            "description_short": "Custom message broker for IoT systems.",
+            "description_full": "Developed software to manage data exchange between web and modules during user registration or command sending. Checked module connection status and managed stable and synchronized communications between systems. Ensured correct data transfer and synchronization between web and modules for accurate information processing. Improved system performance and stability through effective management of data flows and module monitoring.",
+            "date": "November 2021",
+            "images": [
+                "/images/projects/message-broker-for-capital-system-module-management.svg"
+            ]
+        },
+        {
+            "title": "IoT Cooling System Backend",
+            "tech_stack": "Flask, SQLAlchemy, Python",
+            "description_short": "Backend system for IoT cooling control.",
+            "description_full": "Developed web-based software to control existing coolers and manage their remote operation. Enabled time schedule definition for coolers with automatic application of settings based on specified scheduling. Backend developed with Python and Flask with data management using SQLAlchemy for data storage and retrieval. Ensured stable system performance and correct synchronization between web and devices for optimal cooler control. Designed user-friendly and simple web user interface for easy access to settings and time schedules.",
+            "date": "November 2021",
+            "images": [
+                "/images/projects/iot-cooling-system-backend.svg"
+            ]
+        },
+        {
+            "title": "UseFul",
+            "tech_stack": "Python, Threading",
+            "description_short": "Automation scripts and threading utilities.",
+            "description_full": "Developed an open-source project for managing threads and performing concurrent operations in Python. Designed and built database object structures with capability to define and automatically manage relationships between new tables. Developed mechanism to check queries before execution to ensure correct communication with database and prevent runtime errors. Provided development tools for monitoring and managing threads, increasing efficiency and stability of programs. Designed modular APIs for use by other open-source project developers. Link: https://github.com/dot1mav/UseFul",
+            "date": "Not specified",
+            "github": "https://github.com/dot1mav/UseFul",
+            "images": [
+                "/images/projects/useful.svg"
+            ]
+        },
+        {
+            "title": "OwnFirewall",
+            "tech_stack": "iptables, Python, Shell",
+            "description_short": "Custom Linux firewall.",
+            "description_full": "Developed an open-source project for automatic configuration of iptables on user servers and systems. Goal: Simplifying firewall management for individuals who don't have complete experience with iptables. Developed automation mechanisms to set security rules including opening and closing ports, setting access, and applying standard security policies. Designed usable interface and automatic scripts to increase server security and reduce human errors. Provided development tools and standard documentation for easier use by other developers and system administrators. Link: https://github.com/dot1mav/OwnFirewall",
+            "date": "Not specified",
+            "github": "https://github.com/dot1mav/OwnFirewall",
+            "images": [
+                "/images/projects/ownfirewall.svg"
+            ]
+        },
+        {
+            "title": "Web Scraping Tools",
+            "tech_stack": "Python",
+            "description_short": "Data collection tools for marketing.",
+            "description_full": "Developed web scraping tools to gather customer and market data for CRM and marketing insights.",
+            "date": "2023",
+            "images": [
+                "/images/projects/web-scraping-tools.svg"
+            ]
+        },
+        {
+            "title": "Grafana CRM Dashboards",
+            "tech_stack": "Grafana",
+            "description_short": "CRM analytics dashboards.",
+            "description_full": "Created interactive Grafana dashboards connected to CRM datasets for business insights.",
+            "date": "2023",
+            "images": [
+                "/images/projects/grafana-crm-dashboards.svg"
+            ]
+        },
+        {
+            "title": "DOH Proxy",
+            "tech_stack": "JavaScript",
+            "description_short": "DNS over HTTPS proxy.",
+            "description_full": "Developed a proxy for secure DNS-over-HTTPS requests.",
+            "date": "Not specified",
+            "images": [
+                "/images/projects/doh-proxy.svg"
+            ]
+        },
+        {
+            "title": "Flask Blueprints Auto Importer",
+            "tech_stack": "Python, Flask",
+            "description_short": "Blueprint auto-import tool.",
+            "description_full": "A utility script to automatically load Flask blueprints to simplify project structure.",
+            "date": "2023",
+            "images": [
+                "/images/projects/flask-blueprints-auto-importer.svg"
+            ]
+        },
+        {
+            "title": "Custom Python Thread",
+            "tech_stack": "Python, Threading",
+            "description_short": "Reusable threading structure.",
+            "description_full": "Implemented a reusable thread class using Python's threading module for concurrent tasks.",
+            "date": "2023",
+            "images": [
+                "/images/projects/custom-python-thread.svg"
+            ]
+        }
+    ],
+    "certifications": [
+        {
+            "name": "Network+",
+            "issuer": "Technical and Vocational Training Organization",
+            "date": "November 2013"
+        },
+        {
+            "name": "Microsoft Service Manager",
+            "issuer": "Technical and Vocational Training Organization",
+            "date": "February 2014"
+        },
+        {
+            "name": "Security+",
+            "issuer": "Technical and Vocational Training Organization",
+            "date": "March 2014"
+        },
+        {
+            "name": "CCNA",
+            "issuer": "Technical and Vocational Training Organization",
+            "date": "July 2014"
+        },
+        {
+            "name": "LPIC-1",
+            "issuer": "Technical and Vocational Training Organization",
+            "date": "August 2014"
+        },
+        {
+            "name": "Python Programming Certificate",
+            "issuer": "Technical and Vocational Training Organization",
+            "date": "November 2025"
+        }
+    ],
+    "skills": {
+        "frontend": "Vue.js, jQuery, JavaScript, Bootstrap, Tkinter, Electron.js, Nuxt.js",
+        "backend": "Python, Django, Flask, FastAPI, Celery, C++, Requests, SQLAlchemy",
+        "database": "MariaDB, PostgreSQL, Redis, ORM, Query Optimization",
+        "tools": "Git, Docker, Linux, Bash, Lua, Pandas, NumPy, Nginx, Apache, iptables, MikroTik, Grafana, Cronjob, MQTT, unittest, doctest, Postfix",
+        "cloud": "Minio",
+        "other": "IoT server-side data processing, automation scripting, networking, system monitoring, MikroTik device configuration"
+    },
+    "languages": {
+        "Persian": {
+            "spoken": "Native",
+            "written": "Native"
+        },
+        "English": {
+            "spoken": "Intermediate",
+            "written": "Intermediate",
+            "listening": "Intermediate",
+            "reading": "Intermediate"
+        }
+    }
+}

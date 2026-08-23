@@ -1,5 +1,6 @@
 <template>
   <div class="terminal" @click="handleTerminalClick">
+    <!-- MS-DOS title bar (blue, like the real thing) -->
     <div class="terminal-header">
       <div class="terminal-header-left">
         <button type="button" class="t-menu-btn" :class="{ active: terminalMenu === 'file' }"
@@ -12,6 +13,7 @@
       <span class="terminal-header-title">MS-DOS Prompt</span>
     </div>
 
+    <!-- Dropdown menus -->
     <div class="terminal-menus">
       <ul v-if="terminalMenu === 'file'" class="terminal-menu">
         <li><button type="button" class="terminal-menu-item"
@@ -29,6 +31,7 @@
       </ul>
     </div>
 
+    <!-- Terminal output (scrolling region) -->
     <div class="terminal-output" ref="terminalOutputEl" role="log" aria-live="polite" aria-label="Terminal output">
       <div v-for="(line, index) in terminalLines" :key="index" :class="['t-line', line.type]">
         <a v-if="line.type === 'link'" class="t-link" :href="line.href" target="_blank"
@@ -37,13 +40,14 @@
       </div>
     </div>
 
+    <!-- Input line -->
     <div class="terminal-input-line">
       <span class="t-prompt">{{ terminalPrompt }}</span>
       <input ref="terminalInputEl" v-model="terminalInput" type="text" autocomplete="off"
         spellcheck="false" aria-label="Terminal input" @keydown="onTerminalKeydown"
         :style="{ width: terminalInputWidth }" />
       <span class="t-caret"></span>
-      <span class="t-hint">Tab = autocomplete · ↑↓ = history</span>
+      <span class="t-hint">Tab=autocomplete  ↑↓=history  F1=help</span>
     </div>
   </div>
 </template>
@@ -70,9 +74,7 @@ const {
 </script>
 
 <style scoped>
-/* Fills the window body exactly (the body is absolutely pinned
-   below the title bar by OSWindow). The output area is the only
-   scrolling region, so jumping to the bottom always works. */
+/* Authentic MS-DOS Prompt styling */
 .terminal {
   position: relative;
   height: 100%;
@@ -81,13 +83,15 @@ const {
   min-height: 0;
   background: #000;
   color: #c0c0c0;
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 13px;
-  line-height: 1.5;
+  font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', monospace !important;
+  font-size: 14px;
+  line-height: 1.3;
   overflow: hidden;
+  border: 2px solid;
+  border-color: #808080 #fff #fff #808080;
 }
 
-/* Menu bar, MS-DOS Prompt style. */
+/* Menu bar - classic blue gradient */
 .terminal-header {
   flex: 0 0 auto;
   display: flex;
@@ -98,36 +102,37 @@ const {
   color: #fff;
   font-size: 11px;
   font-weight: 700;
-  padding: 2px 6px;
-  border-bottom: 1px solid #000060;
+  padding: 2px 4px;
+  border-bottom: 1px solid #000040;
   user-select: none;
 }
 
 .terminal-header-left {
   display: flex;
-  gap: 2px;
+  gap: 0;
 }
 
 .terminal-header-title {
-  letter-spacing: 0.3px;
-  opacity: 0.9;
+  letter-spacing: 0.5px;
+  opacity: 0.95;
+  font-style: italic;
 }
 
 .t-menu-btn {
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   color: #fff;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'MS Sans Serif', Tahoma, sans-serif;
   font-size: 11px;
-  font-weight: 700;
-  padding: 1px 7px;
+  font-weight: 400;
+  padding: 1px 6px;
   cursor: pointer;
   line-height: 1.4;
 }
 
 .t-menu-btn:hover,
 .t-menu-btn.active {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.15);
   outline: 1px dotted #fff;
   outline-offset: -2px;
 }
@@ -161,7 +166,7 @@ const {
   background: transparent;
   border: none;
   padding: 3px 12px;
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: 'MS Sans Serif', Tahoma, sans-serif;
   font-size: 12px;
   color: #000;
   cursor: pointer;
@@ -172,14 +177,13 @@ const {
   color: #fff;
 }
 
-/* Output region. min-height:0 is what lets this element shrink
-   and scroll instead of pushing the input line out of the window. */
+/* Output area */
 .terminal-output {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 6px 10px 8px;
+  padding: 8px 10px;
   white-space: pre-wrap;
   word-break: break-word;
   user-select: text;
@@ -187,20 +191,21 @@ const {
 }
 
 .terminal-output::-webkit-scrollbar {
-  width: 14px;
+  width: 16px;
 }
 
 .terminal-output::-webkit-scrollbar-track {
   background: #000;
+  border-left: 1px solid #333;
 }
 
 .terminal-output::-webkit-scrollbar-thumb {
-  background: #7f7f7f;
-  border: 3px solid #000;
+  background: #555;
+  border: 2px solid #000;
 }
 
 .terminal-output::-webkit-scrollbar-thumb:hover {
-  background: #a0a0a0;
+  background: #777;
 }
 
 .terminal ::selection {
@@ -208,8 +213,9 @@ const {
   color: #fff;
 }
 
+/* Line types */
 .t-line {
-  min-height: 1.2em;
+  min-height: 1.3em;
 }
 
 .t-cmd {
@@ -226,40 +232,39 @@ const {
 }
 
 .t-success {
-  color: #00d000;
+  color: #55ff55;
 }
 
 .t-err {
-  color: #ff6060;
+  color: #ff5555;
 }
 
 .t-accent {
   color: #ffff55;
+  font-weight: 700;
 }
 
 .t-link {
-  color: #6cb8ff;
+  color: #5599ff;
   text-decoration: underline;
   cursor: pointer;
 }
 
 .t-link:hover {
-  color: #a8dcff;
-  background: rgba(0, 80, 180, 0.35);
+  color: #99ccff;
+  background: rgba(0, 80, 180, 0.4);
 }
 
-/* Input strip: distinct background so it reads as the live line.
-   The input can never exceed the line width, so a long command
-   clips instead of shoving the caret or hint off-screen. */
+/* Input line */
 .terminal-input-line {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px 10px 7px;
-  border-top: 1px solid #2a2a2a;
+  gap: 0;
+  padding: 6px 10px 8px;
+  border-top: 1px solid #333;
   background: #0a0a0a;
-  min-height: 28px;
+  min-height: 30px;
   overflow: hidden;
 }
 
@@ -278,8 +283,8 @@ const {
   border: none;
   outline: none;
   color: #fff;
-  font-family: 'IBM Plex Mono', monospace !important;
-  font-size: 13px;
+  font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', monospace !important;
+  font-size: 14px;
   padding: 0;
   caret-color: transparent;
   overflow: hidden;
@@ -289,45 +294,34 @@ const {
 .t-caret {
   display: inline-block;
   flex: 0 0 auto;
-  width: 7px;
-  height: 14px;
+  width: 8px;
+  height: 15px;
   background: #c0c0c0;
   animation: t-blink 1s steps(1) infinite;
+  margin-left: 1px;
 }
 
 .t-hint {
   margin-left: auto;
-  color: #5a5a5a;
+  color: #555;
   font-size: 10px;
   white-space: nowrap;
   user-select: none;
+  font-family: 'MS Sans Serif', Tahoma, sans-serif;
 }
 
 @keyframes t-blink {
-  50% {
-    opacity: 0;
-  }
+  50% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .t-caret {
-    animation: none;
-  }
+  .t-caret { animation: none; }
 }
 
 @media (max-width: 480px) {
-  .terminal {
-    font-size: 11px;
-  }
-  .terminal-input-line input {
-    font-size: 11px;
-  }
-  .t-caret {
-    width: 6px;
-    height: 12px;
-  }
-  .t-hint {
-    display: none;
-  }
+  .terminal { font-size: 12px; }
+  .terminal-input-line input { font-size: 12px; }
+  .t-caret { width: 6px; height: 12px; }
+  .t-hint { display: none; }
 }
 </style>

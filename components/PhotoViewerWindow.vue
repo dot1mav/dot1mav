@@ -79,6 +79,11 @@ async function loadGallery(filterProjectTitle) {
   }
 }
 
+// Load all photos on mount so the gallery is always available
+onMounted(() => {
+  if (!galleryLoaded.value) loadGallery()
+})
+
 const photoProjects = computed(() => {
   const set = new Set()
   gallery.value.forEach((img) => {

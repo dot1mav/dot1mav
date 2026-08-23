@@ -1724,3 +1724,124 @@ body {
         transition: none !important;
     }
 }
+
+/* ===== Win98 Desktop Enhancements ===== */
+
+/* Classic Win98 desktop pattern overlay */
+.desktop::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 128, 0.03) 2px,
+            rgba(0, 0, 128, 0.03) 4px
+        );
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Window open animation */
+.window {
+    animation: windowOpen 0.12s ease-out;
+}
+
+@keyframes windowOpen {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Win98 button hover effect */
+button:hover:not(:disabled) {
+    filter: brightness(1.02);
+}
+
+/* Classic Win98 depressed button state */
+button:active:not(:disabled) {
+    filter: brightness(0.98);
+}
+
+/* Window title bar gradient - more authentic */
+.title-bar {
+    background: linear-gradient(90deg, #000080 0%, #1084d0 50%, #000080 100%) !important;
+}
+
+/* Active window title bar - deeper blue */
+.window:not(.minimized) .title-bar {
+    background: linear-gradient(90deg, #000080 0%, #0000aa 30%, #1084d0 100%) !important;
+}
+
+/* Win98-style resize grip */
+.resize-se {
+    background:
+        linear-gradient(135deg, transparent 50%, #808080 50%, #808080 55%, transparent 55%),
+        linear-gradient(135deg, transparent 60%, #808080 60%, #808080 65%, transparent 65%),
+        linear-gradient(135deg, transparent 70%, #808080 70%, #808080 75%, transparent 75%) !important;
+}
+
+/* Taskbar enhanced styling */
+#taskbar {
+    background: linear-gradient(180deg, #c0c0c0 0%, #b0b0b0 50%, #a0a0a0 100%) !important;
+    box-shadow: 0 -1px 0 #fff inset, 0 1px 0 #404040;
+}
+
+/* Start menu hover animation */
+.start-menu-item {
+    transition: background-color 0.05s;
+}
+
+/* Desktop icon selection effect - authentic blue highlight */
+.icon.selected::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: rgba(0, 0, 128, 0.4);
+    pointer-events: none;
+}
+
+/* Win98-style scrollbar track */
+::-webkit-scrollbar-track {
+    background: #c0c0c0;
+    border: 1px solid #808080;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border: 2px solid;
+    border-color: #fff #808080 #808080 #fff;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #d0d0d0;
+}
+
+/* CRT scanline effect (subtle, can be toggled via body.crt class) */
+body.crt::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 1px,
+        rgba(0, 0, 0, 0.08) 1px,
+        rgba(0, 0, 0, 0.08) 2px
+    );
+    pointer-events: none;
+    z-index: 99999;
+}
+
+/* Win98-style focus ring */
+*:focus-visible {
+    outline: 1px dotted #000;
+    outline-offset: -2px;
+}

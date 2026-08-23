@@ -21,6 +21,7 @@ const windows = reactive({
   svgcreator: { open: false, minimized: false, maximized: false, title: 'SVG Creator', x: 120, y: 90, width: 780, height: 560 },
   photos: { open: false, minimized: false, maximized: false, title: 'Photo Viewer', x: 160, y: 110, width: 760, height: 540 },
   video: { open: false, minimized: false, maximized: false, title: 'Video Player', x: 200, y: 130, width: 720, height: 520 },
+  minesweeper: { open: false, minimized: false, maximized: false, title: 'Minesweeper', x: 250, y: 150, width: 290, height: 400 },
 })
 
 // Drag offsets live here instead of on the window object so a

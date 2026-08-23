@@ -42,6 +42,7 @@
         <SvgCreatorWindow v-else-if="id === 'svgcreator'" />
         <PhotoViewerWindow v-else-if="id === 'photos'" />
         <VideoPlayerWindow v-else-if="id === 'video'" />
+        <MinesweeperWindow v-else-if="id === 'minesweeper'" />
       </OSWindow>
     </div>
 
@@ -83,6 +84,7 @@ const desktopIcons = [
   { id: 'svgcreator', icon: '/images/icons/paint.png', label: 'SVG Creator' },
   { id: 'photos', icon: '/images/icons/photos.png', label: 'Photo Viewer' },
   { id: 'video', icon: '/images/icons/video.png', label: 'Video Player' },
+  { id: 'minesweeper', icon: '/images/icons/paint.png', label: 'Minesweeper' },
 ]
 
 const BOOT_SCRIPT = [

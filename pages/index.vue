@@ -49,14 +49,16 @@
       <div 
         class="desktop-bg" 
         @contextmenu.prevent="showDesktopContextMenu"
-        @click="hideContextMenu"
+        @click="onDesktopClick"
       >
         <DesktopIcon
           v-for="icon in desktopIcons"
           :key="icon.id"
           :icon="icon.icon"
           :label="icon.label"
-          @open="openWindow(icon.id)"
+          :selected="selectedIcon === icon.id"
+          @select="selectedIcon = icon.id"
+          @open="onIconOpen(icon.id)"
           @contextmenu="showIconContextMenu"
         />
       </div>
@@ -82,10 +84,25 @@
     </div>
 
     <!-- Taskbar -->
-    <Taskbar v-show="bootState === 'ready'" :start-menu-open="startMenuOpen" @toggle-start="toggleStartMenu" @start-action="handleStartAction" />
+    <Taskbar v-show="bootState === 'ready'" :start-menu-open="startMenuOpen" @toggle-start="toggleStartMenu" @start-action="handleStartAction" @close-start="startMenuOpen = false" />
 
     <!-- Context Menu -->
     <ContextMenu v-if="contextMenu.visible" :items="contextMenu.items" :position="contextMenu.position" @close="hideContextMenu" @action="handleContextAction" />
+
+    <!-- Snap target shown while a window is dragged to a screen edge -->
+    <Transition name="snap-fade">
+      <div
+        v-if="snapPreview.visible"
+        class="snap-preview"
+        aria-hidden="true"
+        :style="{
+          left: snapPreview.x + 'px',
+          top: snapPreview.y + 'px',
+          width: snapPreview.width + 'px',
+          height: snapPreview.height + 'px',
+        }"
+      ></div>
+    </Transition>
   </div>
 </template>
 
@@ -109,6 +126,7 @@ const {
   layoutWindowsForMobile,
   installKeyboardShortcuts,
   removeKeyboardShortcuts,
+  snapPreview,
 } = useWindows()
 
 const { initDarkMode } = useApp()
@@ -133,7 +151,31 @@ const desktopIcons = [
 ]
 
 const startMenuOpen = ref(false)
+const selectedIcon = ref(null)
 const contextMenu = ref({ visible: false, items: [], position: { x: 0, y: 0 }, target: null })
+
+// Clicking the wallpaper drops the icon selection, like the real desktop.
+function onDesktopClick() {
+  hideContextMenu()
+  startMenuOpen.value = false
+  selectedIcon.value = null
+}
+
+// Clicking anywhere outside the Start menu closes it, the way Windows
+// does — without this the menu lingers over everything.
+function closeStartMenuOnOutsideClick(e) {
+  if (!startMenuOpen.value) return
+  if (e.target.closest('#start-menu') || e.target.closest('#start-btn')) return
+  startMenuOpen.value = false
+}
+
+// A single click selects and opens (deliberately friendlier than
+// Windows' double-click), but the selection is real this time — it
+// stays highlighted until you pick something else.
+function onIconOpen(id) {
+  selectedIcon.value = id
+  openWindow(id)
+}
 
 function scrollToBottom() {
   nextTick(() => {
@@ -480,11 +522,13 @@ function handleContextAction(action, data) {
 
 onMounted(() => {
   runBootSequence()
+  document.addEventListener('mousedown', closeStartMenuOnOutsideClick)
 })
 
 onBeforeUnmount(() => {
   removeSourceGuards()
   removeKeyboardShortcuts()
+  document.removeEventListener('mousedown', closeStartMenuOnOutsideClick)
   window.removeEventListener('resize', handleWindowResize)
   window.removeEventListener('keydown', handleBootKeys)
 })
@@ -566,6 +610,14 @@ onBeforeUnmount(() => {
 .boot-error-terminal {
   border: 2px solid #fff;
   max-width: 760px;
+}
+.snap-fade-enter-active,
+.snap-fade-leave-active {
+  transition: opacity 0.12s ease-out;
+}
+.snap-fade-enter-from,
+.snap-fade-leave-to {
+  opacity: 0;
 }
 .boot-error-header {
   background: #c00;

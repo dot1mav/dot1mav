@@ -1,6 +1,15 @@
 <template>
   <div
-    :class="['window', 'draggable', { minimized: window.minimized, maximized: window.maximized }]"
+    :class="[
+      'window',
+      'draggable',
+      {
+        minimized: window.minimized,
+        maximized: window.maximized,
+        inactive: !active,
+        'animate-geometry': animating,
+      },
+    ]"
     role="dialog"
     :aria-label="window.title"
     :aria-hidden="!window.open"
@@ -14,11 +23,16 @@
     }"
     @mousedown="focus"
   >
-    <div class="title-bar" @mousedown="onTitleBarMouseDown">
+    <div
+      class="title-bar"
+      :class="{ inactive: !active }"
+      @mousedown="onTitleBarMouseDown"
+      @dblclick="toggleMaximize"
+    >
       <div class="title-bar-text">{{ window.title }}</div>
       <div class="title-bar-controls">
         <button @click="minimize" aria-label="Minimize"></button>
-        <button @click="maximize" aria-label="Maximize"></button>
+        <button @click="maximize" :aria-label="window.maximized ? 'Restore' : 'Maximize'"></button>
         <button @click="close" aria-label="Close"></button>
       </div>
     </div>
@@ -27,15 +41,19 @@
     </div>
 
     <template v-if="!window.maximized">
-      <div class="resize-handle resize-e" @mousedown="onResizeStart($event, 'e')"></div>
-      <div class="resize-handle resize-s" @mousedown="onResizeStart($event, 's')"></div>
-      <div class="resize-handle resize-se" @mousedown="onResizeStart($event, 'se')"></div>
+      <div
+        v-for="handle in resizeHandles"
+        :key="handle"
+        class="resize-handle"
+        :class="`resize-${handle}`"
+        @mousedown="onResizeStart($event, handle)"
+      ></div>
     </template>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useWindows } from '../composables/useWindows'
 
 // Windows are rendered once and hidden with display:none when closed,
@@ -64,9 +82,32 @@ const {
   minimizeWindow,
   maximizeWindow,
   closeWindow,
+  isActive,
 } = useWindows()
 
 const window = computed(() => windows[props.id])
+
+// Windows are grey when they're not the one you're working in — the
+// clearest signal of which window has focus on a stack of them.
+const active = computed(() => isActive(props.id))
+
+// Every edge and corner is grabbable, like a real window frame.
+const resizeHandles = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw']
+
+// Geometry changes (maximize/restore) get a short eased transition,
+// but only for those moments — dragging and resizing must stay 1:1
+// with the pointer, so the class is added just for the toggle.
+const animating = ref(false)
+let animationTimer = null
+
+function withGeometryAnimation(callback) {
+  animating.value = true
+  callback()
+  clearTimeout(animationTimer)
+  animationTimer = setTimeout(() => {
+    animating.value = false
+  }, 220)
+}
 
 // Any click inside the window brings it to the front, not just
 // the title bar — that's how the real Windows behaved too.
@@ -87,7 +128,12 @@ function minimize() {
 }
 
 function maximize() {
-  maximizeWindow(props.id)
+  withGeometryAnimation(() => maximizeWindow(props.id))
+}
+
+function toggleMaximize(e) {
+  e.preventDefault()
+  withGeometryAnimation(() => maximizeWindow(props.id))
 }
 
 function close() {
@@ -118,42 +164,9 @@ function close() {
   overflow: hidden;
 }
 
-.resize-handle {
-  position: absolute;
-  z-index: 10;
-}
-
-.resize-e {
-  top: 0;
-  right: -2px;
-  width: 6px;
-  height: 100%;
-  cursor: ew-resize;
-}
-
-.resize-s {
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 6px;
-  cursor: ns-resize;
-}
-
-.resize-se {
-  bottom: -4px;
-  right: -4px;
-  width: 16px;
-  height: 16px;
-  cursor: nwse-resize;
-  background:
-    linear-gradient(135deg, transparent 50%, var(--border-darkest) 50%, var(--border-darkest) 55%, transparent 55%),
-    linear-gradient(135deg, transparent 60%, var(--border-darkest) 60%, var(--border-darkest) 65%, transparent 65%),
-    linear-gradient(135deg, transparent 70%, var(--border-darkest) 70%, var(--border-darkest) 75%, transparent 75%);
-}
-
-@media (pointer: coarse) {
-  .resize-handle {
-    display: none;
+@media (prefers-reduced-motion: reduce) {
+  .full-body {
+    transition: none;
   }
 }
 </style>

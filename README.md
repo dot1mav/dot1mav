@@ -107,6 +107,29 @@ The file system is generated from data.json on the fly, so `cd
 projects` + `dir` always shows the same projects as the rest of the
 site.
 
+## Desktop
+
+The desktop behaves like a window manager, not a picture of one:
+
+```
+drag a title bar        move the window
+drag to a screen edge   snap: top maximizes, sides halve, corners quarter,
+                        with a translucent preview of where it will land
+drag a maximized window pulls it back down to its old size
+double-click title bar  maximize / restore
+drag any edge or corner resize (all 8 directions)
+click a taskbar button  restores it, or minimizes it if it is already focused
+Show Desktop (tray)     minimize everything; click again to restore
+F11                     maximize / restore the window on top
+Ctrl+← / Ctrl+→         cycle the open windows
+arrow keys on icons     walk the icon grid; Enter opens
+Start → search box      filter programs live, ↑/↓/Enter to launch
+```
+
+Window positions and sizes are remembered in `localStorage`, so the
+desktop comes back the way you left it. Only the focused window has the
+blue title bar; the rest go grey.
+
 ## Misc
 
 - Analytics via Umami, loaded from the cloud script in `nuxt.config.ts`.

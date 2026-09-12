@@ -10,18 +10,19 @@ import { reactive, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useAnalytics } from './useAnalytics'
 
 const windows = reactive({
-  projects: { open: false, minimized: false, maximized: false, title: 'Projects', x: 100, y: 100, width: 800, height: 480 },
-  experiences: { open: false, minimized: false, maximized: false, title: 'Experiences', x: 120, y: 120, width: 700, height: 420 },
-  skills: { open: false, minimized: false, maximized: false, title: 'Skills', x: 140, y: 140, width: 600, height: 460 },
-  certifications: { open: false, minimized: false, maximized: false, title: 'Certifications', x: 160, y: 160, width: 700, height: 460 },
-  contact: { open: false, minimized: false, maximized: false, title: 'Contact', x: 180, y: 180, width: 400, height: 300 },
-  about: { open: false, minimized: false, maximized: false, title: 'About Me', x: 200, y: 200, width: 550, height: 520 },
-  terminal: { open: false, minimized: false, maximized: false, title: 'MS-DOS Prompt', x: 220, y: 220, width: 720, height: 480 },
-  project: { open: false, minimized: false, maximized: false, title: 'Project', x: 180, y: 120, width: 760, height: 520 },
-  svgcreator: { open: false, minimized: false, maximized: false, title: 'SVG Creator', x: 120, y: 90, width: 780, height: 560 },
-  photos: { open: false, minimized: false, maximized: false, title: 'Photo Viewer', x: 160, y: 110, width: 760, height: 540 },
-  video: { open: false, minimized: false, maximized: false, title: 'Video Player', x: 200, y: 130, width: 720, height: 520 },
-  minesweeper: { open: false, minimized: false, maximized: false, title: 'Minesweeper', x: 250, y: 150, width: 290, height: 400 },
+  projects: { open: false, minimized: false, maximized: false, title: 'Projects', icon: '/images/icons/projects.png', x: 100, y: 100, width: 800, height: 480 },
+  experiences: { open: false, minimized: false, maximized: false, title: 'Experiences', icon: '/images/icons/experiences.png', x: 120, y: 120, width: 700, height: 420 },
+  skills: { open: false, minimized: false, maximized: false, title: 'Skills', icon: '/images/icons/skills.png', x: 140, y: 140, width: 600, height: 460 },
+  certifications: { open: false, minimized: false, maximized: false, title: 'Certifications', icon: '/images/icons/certificates.png', x: 160, y: 160, width: 700, height: 460 },
+  contact: { open: false, minimized: false, maximized: false, title: 'Contact', icon: '/images/icons/contact.png', x: 180, y: 180, width: 400, height: 300 },
+  about: { open: false, minimized: false, maximized: false, title: 'About Me', icon: '/images/icons/info.png', x: 200, y: 200, width: 550, height: 520 },
+  terminal: { open: false, minimized: false, maximized: false, title: 'MS-DOS Prompt', icon: '/images/icons/modem-4.png', x: 220, y: 220, width: 720, height: 480 },
+  project: { open: false, minimized: false, maximized: false, title: 'Project', icon: '/images/icons/projects.png', x: 180, y: 120, width: 760, height: 520 },
+  svgcreator: { open: false, minimized: false, maximized: false, title: 'SVG Creator', icon: '/images/icons/paint.png', x: 120, y: 90, width: 780, height: 560 },
+  photos: { open: false, minimized: false, maximized: false, title: 'Photo Viewer', icon: '/images/icons/photos.png', x: 160, y: 110, width: 760, height: 540 },
+  video: { open: false, minimized: false, maximized: false, title: 'Video Player', icon: '/images/icons/video.png', x: 200, y: 130, width: 720, height: 520 },
+  minesweeper: { open: false, minimized: false, maximized: false, title: 'Minesweeper', icon: '/images/icons/paint.png', x: 250, y: 150, width: 290, height: 400 },
+  solitaire: { open: false, minimized: false, maximized: false, title: 'Solitaire', icon: '/images/icons/solitaire.png', x: 170, y: 110, width: 620, height: 520 },
 })
 
 // Drag offsets live here instead of on the window object so a
@@ -32,10 +33,13 @@ const dragState = reactive({
   windowId: null,
   startX: 0,
   startY: 0,
+  originX: 0,
+  originY: 0,
+  pendingUnmaximize: false,
 })
 
-// Same idea for resize. Handles are 'e' (right edge), 's' (bottom
-// edge) or 'se' (bottom-right corner).
+// Same idea for resize. Handles are compass points — 'n', 'e', 's',
+// 'w' plus the four corners.
 const resizeState = reactive({
   isResizing: false,
   windowId: null,
@@ -44,7 +48,113 @@ const resizeState = reactive({
   startY: 0,
   startWidth: 0,
   startHeight: 0,
+  startWindowX: 0,
+  startWindowY: 0,
 })
+
+// Window geometry survives a reload, like a real desktop session.
+// Only x/y/width/height are stored: a window that was maximized when
+// you left should still open as a normal window next visit.
+const GEOMETRY_KEY = 'mav-window-geometry'
+
+function loadSavedGeometry() {
+  if (typeof window === 'undefined') return
+  // The stacked mobile layout wins over saved desktop coordinates.
+  if (window.innerWidth < 768) return
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(GEOMETRY_KEY) || '{}')
+    for (const [id, geometry] of Object.entries(saved)) {
+      if (!windows[id] || !geometry) continue
+      for (const key of ['x', 'y', 'width', 'height']) {
+        if (typeof geometry[key] === 'number' && Number.isFinite(geometry[key])) {
+          windows[id][key] = geometry[key]
+        }
+      }
+    }
+  } catch {
+    // Unreadable storage isn't worth breaking the desktop over.
+  }
+}
+
+let saveGeometryTimer = null
+
+function saveGeometry() {
+  if (typeof window === 'undefined') return
+  clearTimeout(saveGeometryTimer)
+  saveGeometryTimer = setTimeout(() => {
+    const snapshot = {}
+    for (const [id, win] of Object.entries(windows)) {
+      snapshot[id] = { x: win.x, y: win.y, width: win.width, height: win.height }
+    }
+    try {
+      window.localStorage.setItem(GEOMETRY_KEY, JSON.stringify(snapshot))
+    } catch {
+      // Storage full or blocked — geometry just won't persist.
+    }
+  }, 300)
+}
+
+// Snap targets while a title bar is being dragged: the four edges
+// maximize or halve, the corners give quarters. This is the one
+// behaviour that makes a browser desktop feel like a real one.
+const SNAP_EDGE = 6
+const TASKBAR_HEIGHT = 30
+
+const snapPreview = reactive({ visible: false, zone: null, x: 0, y: 0, width: 0, height: 0 })
+
+// The viewport is passed in (with a live default) so the snap maths can
+// be unit-tested without a browser.
+function viewport() {
+  if (typeof window === 'undefined') return { width: 1024, height: 768 }
+  return { width: window.innerWidth, height: window.innerHeight }
+}
+
+export function snapZoneFor(clientX, clientY, view = viewport()) {
+  const nearTop = clientY <= SNAP_EDGE
+  const nearBottom = clientY >= view.height - TASKBAR_HEIGHT - SNAP_EDGE
+  const nearLeft = clientX <= SNAP_EDGE
+  const nearRight = clientX >= view.width - SNAP_EDGE
+
+  if (nearTop && nearLeft) return 'top-left'
+  if (nearTop && nearRight) return 'top-right'
+  if (nearBottom && nearLeft) return 'bottom-left'
+  if (nearBottom && nearRight) return 'bottom-right'
+  if (nearTop) return 'maximize'
+  if (nearLeft) return 'left'
+  if (nearRight) return 'right'
+  return null
+}
+
+export function snapRect(zone, view = viewport()) {
+  const width = view.width
+  const height = view.height - TASKBAR_HEIGHT
+  const halfWidth = Math.round(width / 2)
+  const halfHeight = Math.round(height / 2)
+
+  switch (zone) {
+    case 'maximize': return { x: 0, y: 0, width, height }
+    case 'left': return { x: 0, y: 0, width: halfWidth, height }
+    case 'right': return { x: width - halfWidth, y: 0, width: halfWidth, height }
+    case 'top-left': return { x: 0, y: 0, width: halfWidth, height: halfHeight }
+    case 'top-right': return { x: width - halfWidth, y: 0, width: halfWidth, height: halfHeight }
+    case 'bottom-left': return { x: 0, y: height - halfHeight, width: halfWidth, height: halfHeight }
+    case 'bottom-right': return { x: width - halfWidth, y: height - halfHeight, width: halfWidth, height: halfHeight }
+    default: return null
+  }
+}
+
+function rememberGeometry(win) {
+  win.prevX = win.x
+  win.prevY = win.y
+  win.prevWidth = win.width
+  win.prevHeight = win.height
+}
+
+// Restore the last session's layout as soon as this module reaches the
+// browser (never during SSR).
+if (typeof window !== 'undefined') {
+  loadSavedGeometry()
+}
 
 // Increments forever — each focus just takes the next number, so
 // the last clicked window is always the one on top. Starts at 1000
@@ -67,6 +177,40 @@ export function useWindows() {
     }
     return result
   })
+
+  // Highest z-index among the visible windows. Title bars compare
+  // against this so the inactive ones can go grey, like the real thing.
+  const topZ = computed(() => {
+    let top = -1
+    for (const win of Object.values(windows)) {
+      if (win.open && !win.minimized && win.z > top) top = win.z
+    }
+    return top
+  })
+
+  function isActive(id) {
+    const win = windows[id]
+    return Boolean(win && win.open && !win.minimized && win.z === topZ.value)
+  }
+
+  const hasVisibleWindow = computed(() =>
+    Object.values(windows).some((win) => win.open && !win.minimized)
+  )
+
+  // "Show desktop" — hide everything, or bring it all back if the
+  // desktop is already clear.
+  function toggleShowDesktop() {
+    const visible = Object.values(windows).filter((win) => win.open && !win.minimized)
+    if (visible.length) {
+      visible.forEach((win) => {
+        win.minimized = true
+      })
+    } else {
+      Object.keys(windows).forEach((id) => {
+        if (windows[id].open) restoreWindow(id)
+      })
+    }
+  }
 
   // Brings a window to the front. Called on open, on click anywhere
   // in the window, and on title-bar grabs.
@@ -126,15 +270,12 @@ export function useWindows() {
     win.maximized = !win.maximized
     if (win.maximized) {
       // Save the old spot so un-maximizing puts it back where it was.
-      win.prevX = win.x
-      win.prevY = win.y
-      win.prevWidth = win.width
-      win.prevHeight = win.height
+      rememberGeometry(win)
 
       win.x = 0
       win.y = 0
       win.width = window.innerWidth
-      win.height = Math.max(window.innerHeight - 28, 200)
+      win.height = Math.max(window.innerHeight - TASKBAR_HEIGHT, 200)
     } else {
       win.x = win.prevX !== undefined ? win.prevX : 100
       win.y = win.prevY !== undefined ? win.prevY : 100
@@ -142,6 +283,7 @@ export function useWindows() {
       win.height = win.prevHeight !== undefined ? win.prevHeight : 400
     }
     focusWindow(id)
+    saveGeometry()
 
     sendUmamiEvent('window_maximize_toggle', {
       window_id: id,
@@ -158,41 +300,108 @@ export function useWindows() {
 
     focusWindow(id)
 
+    const win = windows[id]
+
     dragState.isDragging = true
     dragState.windowId = id
-    dragState.startX = e.clientX - windows[id].x
-    dragState.startY = e.clientY - windows[id].y
+    dragState.startX = e.clientX - win.x
+    dragState.startY = e.clientY - win.y
+    dragState.originX = e.clientX
+    dragState.originY = e.clientY
+    // A maximized window only shrinks back down once the pointer really
+    // moves, so a double-click on the title bar still reads as
+    // maximize/restore rather than drag-away.
+    dragState.pendingUnmaximize = win.maximized
 
+    document.body.classList.add('is-dragging-window')
     document.addEventListener('mousemove', handleDrag)
     document.addEventListener('mouseup', stopDrag)
   }
 
   function handleDrag(e) {
-    if (dragState.isDragging && dragState.windowId) {
-      const id = dragState.windowId
+    if (!dragState.isDragging || !dragState.windowId) return
 
-      let newX = e.clientX - dragState.startX
-      let newY = e.clientY - dragState.startY
+    const id = dragState.windowId
+    const win = windows[id]
 
-      // Leave a sliver of the window reachable so it can't be flung
-      // fully off-screen and become impossible to grab again.
-      const maxX = window.innerWidth - 100
-      const maxY = window.innerHeight - 100
+    // Pull a maximized window back to its old size, keeping the grab
+    // point under the pointer so nothing jumps.
+    if (dragState.pendingUnmaximize) {
+      const movedX = Math.abs(e.clientX - dragState.originX)
+      const movedY = Math.abs(e.clientY - dragState.originY)
+      if (movedX < 5 && movedY < 5) return
 
-      newX = Math.max(0, Math.min(newX, maxX))
-      newY = Math.max(0, Math.min(newY, maxY))
+      const restoreWidth = win.prevWidth ?? 600
+      const restoreHeight = win.prevHeight ?? 400
+      const grabRatio = dragState.originX / window.innerWidth
 
-      windows[id].x = newX
-      windows[id].y = newY
+      win.maximized = false
+      win.width = restoreWidth
+      win.height = restoreHeight
+      win.x = Math.max(0, Math.min(dragState.originX - restoreWidth * grabRatio, window.innerWidth - restoreWidth))
+      win.y = Math.max(0, dragState.originY - 12)
+
+      dragState.startX = e.clientX - win.x
+      dragState.startY = e.clientY - win.y
+      dragState.pendingUnmaximize = false
+    }
+
+    let newX = e.clientX - dragState.startX
+    let newY = e.clientY - dragState.startY
+
+    // Leave a sliver of the window reachable so it can't be flung
+    // fully off-screen and become impossible to grab again.
+    newX = Math.max(0, Math.min(newX, window.innerWidth - 100))
+    newY = Math.max(0, Math.min(newY, window.innerHeight - 100))
+
+    windows[id].x = newX
+    windows[id].y = newY
+
+    // Show where the window will land if the pointer is in a snap zone.
+    const zone = snapZoneFor(e.clientX, e.clientY)
+    const rect = zone ? snapRect(zone) : null
+    if (rect) {
+      Object.assign(snapPreview, rect)
+      snapPreview.zone = zone
+      snapPreview.visible = true
+    } else {
+      snapPreview.zone = null
+      snapPreview.visible = false
     }
   }
 
   function stopDrag() {
+    if (dragState.isDragging && dragState.windowId && snapPreview.zone) {
+      const id = dragState.windowId
+      const win = windows[id]
+
+      if (snapPreview.zone === 'maximize') {
+        maximizeWindow(id)
+      } else {
+        const rect = snapRect(snapPreview.zone)
+        // Remember where it came from so dragging the title bar again
+        // (or double-clicking it) can undo the snap.
+        rememberGeometry(win)
+        win.x = rect.x
+        win.y = rect.y
+        win.width = rect.width
+        win.height = rect.height
+        focusWindow(id)
+      }
+
+      snapPreview.visible = false
+      snapPreview.zone = null
+    }
+
     dragState.isDragging = false
     dragState.windowId = null
+    dragState.pendingUnmaximize = false
 
+    document.body.classList.remove('is-dragging-window')
     document.removeEventListener('mousemove', handleDrag)
     document.removeEventListener('mouseup', stopDrag)
+
+    saveGeometry()
   }
 
   function startResize(e, id, handle) {
@@ -212,7 +421,10 @@ export function useWindows() {
     resizeState.startY = e.clientY
     resizeState.startWidth = win.width
     resizeState.startHeight = win.height
+    resizeState.startWindowX = win.x
+    resizeState.startWindowY = win.y
 
+    document.body.classList.add('is-resizing-window')
     document.addEventListener('mousemove', handleResize)
     document.addEventListener('mouseup', stopResize)
   }
@@ -221,22 +433,44 @@ export function useWindows() {
     if (!resizeState.isResizing || !resizeState.windowId) return
 
     const win = windows[resizeState.windowId]
+    const handle = resizeState.handle
     const dx = e.clientX - resizeState.startX
     const dy = e.clientY - resizeState.startY
 
-    // Min size keeps the title bar usable and the content readable.
-    // Also clamp to the viewport so a window can't grow off-screen.
-    if (resizeState.handle.includes('e')) {
+    // East side: grow/shrink from the right edge.
+    if (handle.includes('e')) {
       win.width = Math.min(
         window.innerWidth,
         Math.max(MIN_WINDOW_WIDTH, resizeState.startWidth + dx)
       )
     }
-    if (resizeState.handle.includes('s')) {
+
+    // West side: the right edge stays put, so x moves with the width.
+    if (handle.includes('w')) {
+      const width = Math.min(
+        resizeState.startWindowX + resizeState.startWidth,
+        Math.max(MIN_WINDOW_WIDTH, resizeState.startWidth - dx)
+      )
+      win.width = width
+      win.x = resizeState.startWindowX + (resizeState.startWidth - width)
+    }
+
+    // South side: grow/shrink from the bottom edge.
+    if (handle.includes('s')) {
       win.height = Math.min(
-        window.innerHeight - 28,
+        window.innerHeight - TASKBAR_HEIGHT,
         Math.max(MIN_WINDOW_HEIGHT, resizeState.startHeight + dy)
       )
+    }
+
+    // North side: the bottom edge stays put, so y moves with the height.
+    if (handle.includes('n')) {
+      const height = Math.min(
+        resizeState.startWindowY + resizeState.startHeight,
+        Math.max(MIN_WINDOW_HEIGHT, resizeState.startHeight - dy)
+      )
+      win.height = height
+      win.y = resizeState.startWindowY + (resizeState.startHeight - height)
     }
   }
 
@@ -244,8 +478,11 @@ export function useWindows() {
     resizeState.isResizing = false
     resizeState.windowId = null
 
+    document.body.classList.remove('is-resizing-window')
     document.removeEventListener('mousemove', handleResize)
     document.removeEventListener('mouseup', stopResize)
+
+    saveGeometry()
   }
 
   // Keeps open windows from sitting below the taskbar after a resize.
@@ -377,5 +614,11 @@ export function useWindows() {
     layoutWindowsForMobile,
     installKeyboardShortcuts,
     removeKeyboardShortcuts,
+    // Added for the desktop polish pass
+    snapPreview,
+    topZ,
+    isActive,
+    hasVisibleWindow,
+    toggleShowDesktop,
   }
 }

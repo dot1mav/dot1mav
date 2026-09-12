@@ -1,13 +1,17 @@
 <template>
   <div
+    ref="iconEl"
     :class="['icon', { selected }]"
     role="button"
     :aria-label="`Open ${label}`"
     tabindex="0"
     @click="handleClick"
-    @keydown.enter="$emit('open')"
+    @focus="$emit('select')"
+    @keydown.enter.prevent="$emit('open')"
+    @keydown.space.prevent="$emit('open')"
+    @keydown="handleArrowKeys"
   >
-    <img :src="icon" :alt="label">
+    <img :src="icon" :alt="label" draggable="false">
     <span class="icon-label">{{ label }}</span>
   </div>
 </template>
@@ -24,18 +28,69 @@ defineProps({
     type: String,
     required: true,
   },
+  selected: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-const emit = defineEmits(['open'])
+const emit = defineEmits(['open', 'select'])
 
-const selected = ref(false)
+const iconEl = ref(null)
 
 function handleClick() {
-  selected.value = true
-  setTimeout(() => {
-    selected.value = false
-    emit('open')
-  }, 150)
+  emit('select')
+  emit('open')
+}
+
+// Arrow keys walk the icon grid the way the real desktop does:
+// left/right step through the DOM order, up/down find the closest
+// icon in that direction so irregular wrapping still behaves.
+function handleArrowKeys(e) {
+  const directions = {
+    ArrowLeft: [-1, 0],
+    ArrowRight: [1, 0],
+    ArrowUp: [0, -1],
+    ArrowDown: [0, 1],
+  }
+  const delta = directions[e.key]
+  if (!delta || !iconEl.value) return
+
+  const parent = iconEl.value.parentElement
+  if (!parent) return
+
+  const siblings = Array.from(parent.querySelectorAll(':scope > .icon'))
+  const currentIndex = siblings.indexOf(iconEl.value)
+  if (currentIndex === -1) return
+
+  const [dx, dy] = delta
+  let target = null
+
+  if (dx !== 0) {
+    target = siblings[currentIndex + dx] || null
+  } else {
+    const current = iconEl.value.getBoundingClientRect()
+    let bestScore = Infinity
+    for (const candidate of siblings) {
+      if (candidate === iconEl.value) continue
+      const rect = candidate.getBoundingClientRect()
+      const vertical = (rect.top - current.top) * dy
+      // Must actually be in the pressed direction, and prefer the
+      // column that lines up best so movement feels predictable.
+      if (vertical <= 4) continue
+      const score = vertical + Math.abs(rect.left - current.left) * 3
+      if (score < bestScore) {
+        bestScore = score
+        target = candidate
+      }
+    }
+  }
+
+  if (!target) return
+  e.preventDefault()
+  // Moving focus fires @focus on the target, which selects it — so
+  // selection always follows the keyboard.
+  target.focus()
 }
 </script>
 

@@ -296,9 +296,16 @@ a:visited { color: var(--link-visited); }
 }
 
 /* ===== Resize Handles ===== */
+/* All eight edges/corners are grabbable. The handles sit slightly
+   outside the frame so the cursor changes right at the border. */
 .resize-handle { position: absolute; z-index: 10; }
 .resize-e { top: 0; right: -4px; width: 8px; height: 100%; cursor: ew-resize; }
+.resize-w { top: 0; left: -4px; width: 8px; height: 100%; cursor: ew-resize; }
+.resize-n { top: -4px; left: 0; width: 100%; height: 8px; cursor: ns-resize; }
 .resize-s { bottom: -4px; left: 0; width: 100%; height: 8px; cursor: ns-resize; }
+.resize-ne { top: -4px; right: -4px; width: 14px; height: 14px; cursor: nesw-resize; }
+.resize-sw { bottom: -4px; left: -4px; width: 14px; height: 14px; cursor: nesw-resize; }
+.resize-nw { top: -4px; left: -4px; width: 14px; height: 14px; cursor: nwse-resize; }
 .resize-se {
   bottom: -4px; right: -4px; width: 14px; height: 14px; cursor: nwse-resize;
   background:
@@ -308,6 +315,64 @@ a:visited { color: var(--link-visited); }
 }
 @media (pointer: coarse) {
   .resize-handle { display: none; }
+}
+
+/* ===== Window Focus, Snapping & Motion ===== */
+/* Unfocused windows get the grey title bar — the clearest way to see
+   which window is actually on top. */
+.window.inactive .title-bar {
+  background: linear-gradient(90deg, #7f7f7f, #b5b5b5);
+}
+.window.inactive {
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, .16);
+}
+
+/* Only used for maximize/restore, never for drag or resize — those
+   must track the pointer exactly. */
+.window.animate-geometry {
+  transition:
+    left 0.18s ease-out,
+    top 0.18s ease-out,
+    width 0.18s ease-out,
+    height 0.18s ease-out;
+}
+
+/* The translucent target shown while dragging a title bar into a
+   snap zone. Blue-tinted glass, Win98 style (square, dotted edge). */
+.snap-preview {
+  position: fixed;
+  z-index: 998;
+  pointer-events: none;
+  background: rgba(23, 59, 120, 0.35);
+  border: 2px dotted rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.12);
+}
+
+/* While a drag or resize is in flight, text selection stays off. The
+   pointer itself is drawn by the custom cursor (the native one is
+   hidden), so the feedback goes there too — see .cursor-ring rules. */
+body.is-dragging-window,
+body.is-resizing-window {
+  user-select: none;
+}
+
+/* !important only to outrank the generic .cursor-hover sizing while a
+   window is being moved or resized. */
+body.is-dragging-window .cursor-ring {
+  width: 42px !important;
+  height: 42px !important;
+  border-width: 2px !important;
+  border-color: rgba(255, 255, 255, 0.9) !important;
+}
+body.is-dragging-window .cursor-dot {
+  width: 10px !important;
+  height: 10px !important;
+}
+body.is-resizing-window .cursor-ring {
+  width: 34px !important;
+  height: 34px !important;
+  border-width: 2px !important;
+  border-color: rgba(255, 255, 255, 0.85) !important;
 }
 
 /* ===================================================

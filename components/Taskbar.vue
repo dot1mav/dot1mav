@@ -96,6 +96,7 @@
 import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useWindows } from '../composables/useWindows'
 import { useApp } from '../composables/useApp'
+import { buildStartMenuSections, filterStartMenuSections } from '../composables/useStartMenu'
 
 const props = defineProps({
   startMenuOpen: { type: Boolean, default: false },
@@ -118,68 +119,14 @@ const currentDate = ref('')
 let clockInterval = null
 
 // The Start menu is data now, which is what lets the search box and
-// arrow-key navigation work over it. Sections without a title are the
-// unlabelled groups Windows 98 used for the theme and power items.
-const menuSections = computed(() => [
-  {
-    title: 'Programs',
-    items: [
-      { label: 'Projects', action: 'projects', icon: '/images/icons/projects.png' },
-      { label: 'Experiences', action: 'experiences', icon: '/images/icons/experiences.png' },
-      { label: 'Skills', action: 'skills', icon: '/images/icons/skills.png' },
-      { label: 'Certifications', action: 'certifications', icon: '/images/icons/certificates.png' },
-      { label: 'Contact', action: 'contact', icon: '/images/icons/contact.png' },
-      { label: 'About Me', action: 'about', icon: '/images/icons/info.png' },
-    ],
-  },
-  {
-    title: 'Accessories',
-    items: [
-      { label: 'MS-DOS Prompt', action: 'terminal', icon: '/images/icons/modem-4.png' },
-      { label: 'SVG Creator', action: 'svgcreator', icon: '/images/icons/paint.png' },
-      { label: 'Photo Viewer', action: 'photos', icon: '/images/icons/photos.png' },
-      { label: 'Video Player', action: 'video', icon: '/images/icons/video.png' },
-    ],
-  },
-  {
-    title: 'Games',
-    separatorAfter: true,
-    items: [
-      { label: 'Minesweeper', action: 'minesweeper', icon: '/images/icons/paint.png' },
-      { label: 'Solitaire', action: 'solitaire', icon: '/images/icons/solitaire.png' },
-    ],
-  },
-  {
-    separatorAfter: true,
-    items: [
-      {
-        label: isDarkMode.value ? 'Light Mode' : 'Dark Mode',
-        action: 'darkmode',
-        glyph: isDarkMode.value ? '☀️' : '🌙',
-      },
-    ],
-  },
-  {
-    items: [
-      { label: 'Restart', action: 'restart', glyph: '🔄', danger: true },
-      { label: 'Shut Down', action: 'shutdown', glyph: '⏻', danger: true },
-    ],
-  },
-])
+// arrow-key navigation work over it. The list itself lives in
+// composables/useStartMenu.js so it can be unit-tested.
+const menuSections = computed(() => buildStartMenuSections(isDarkMode.value))
 
 const menuFilter = ref('')
 const searchEl = ref(null)
 
-const filteredMenu = computed(() => {
-  const needle = menuFilter.value.trim().toLowerCase()
-  if (!needle) return menuSections.value
-  return menuSections.value
-    .map((section) => ({
-      ...section,
-      items: section.items.filter((item) => item.label.toLowerCase().includes(needle)),
-    }))
-    .filter((section) => section.items.length)
-})
+const filteredMenu = computed(() => filterStartMenuSections(menuSections.value, menuFilter.value))
 
 function emitAction(action) {
   emit('start-action', action)

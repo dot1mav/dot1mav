@@ -7,13 +7,10 @@
     <p><strong>Website:</strong>
       <a :href="basics.website" target="_blank" rel="noopener noreferrer">{{ basics.website }}</a>
     </p>
-    <p><strong>Address:</strong> {{ basics.location.city }}, {{ basics.location.region }}, Iran</p>
-    <p><strong>Birthdate:</strong> 1998-05-30</p>
-    <p><strong>Marital Status:</strong> {{ basics.maritalStatus }}</p>
-    <p><strong>Military Status:</strong> {{ basics.militaryStatus }}</p>
+    <p v-if="address"><strong>Address:</strong> {{ address }}</p>
 
-    <h2>Resume Summary</h2>
-    <p>{{ basics.summary }}</p>
+    <h2>About Me</h2>
+    <p v-for="(paragraph, i) in aboutParagraphs" :key="i">{{ paragraph }}</p>
 
     <h2>Educational Background</h2>
     <p>Bachelor's in Computer Engineering - Software</p>
@@ -23,8 +20,15 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useSiteData } from '../composables/useSiteData'
 
 const siteData = useSiteData()
 const basics = siteData.basics || {}
+
+const aboutParagraphs = computed(() =>
+  [siteData.aboutText1, siteData.aboutText2, siteData.aboutText3].filter(Boolean)
+)
+
+const address = computed(() => basics.location?.address || '')
 </script>

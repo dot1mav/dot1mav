@@ -15,13 +15,19 @@
     <p><strong>Telegram:</strong>
       <a href="https://t.me/dot1mav" target="_blank" rel="noopener noreferrer">t.me/dot1mav</a>
     </p>
-    <p><strong>Location:</strong> {{ basics.location.city }}, {{ basics.location.region }}, Iran</p>
+    <p v-if="address"><strong>Location:</strong> {{ address }}</p>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useSiteData } from '../composables/useSiteData'
 
 const siteData = useSiteData()
 const basics = siteData.basics || {}
+
+const address = computed(() => {
+  const loc = basics.location || {}
+  return loc.address || [loc.city, loc.region].filter(Boolean).join(', ')
+})
 </script>

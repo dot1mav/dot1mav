@@ -2,7 +2,7 @@
   <div>
     <div class="projects-controls">
       <input v-model="projectsSearch" type="search"
-        placeholder="Search projects (title, description, tech)..." aria-label="Search projects" />
+        placeholder="Search projects (title, description, tech)…" aria-label="Search projects" />
       <select v-model="projectsTechFilter" aria-label="Filter by technology">
         <option value="">All technologies</option>
         <option v-for="t in allProjectTags" :key="t" :value="t">{{ t }}</option>

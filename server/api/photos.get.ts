@@ -3,9 +3,9 @@
 // when opened from a project's detail window.
 import { getProjectPhotos } from '../utils/site-data'
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const { project } = getQuery(event)
-  const photos = getProjectPhotos()
+  const photos = await getProjectPhotos()
 
   if (!project) return photos
 

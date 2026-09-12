@@ -1,9 +1,9 @@
 // Accepts an optional ?q= to filter by title, tech or description.
 import { getProjects } from '../utils/site-data'
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const { q } = getQuery(event)
-  const projects = getProjects()
+  const projects = await getProjects()
 
   if (!q) return projects
 

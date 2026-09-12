@@ -5,7 +5,7 @@
         "email": "dot1mav@gmail.com",
         "phone": "",
         "website": "http://dot1mav.ir",
-        "summary": "I'm a software engineer experienced in building web and desktop systems, process automation, IoT data integration, backend services, and data-driven applications. I specialize in Python, Django, Flask, Vue.js, Electron.js, database design, server management, and system optimization.",
+        "summary": "Software engineer from Bandar Abbas, Iran. Python backends with Django and Flask, Vue.js and Electron frontends, and industrial data systems for meters, IoT devices, and factory equipment.",
         "location": {
             "address": "Bandar Abbas, Hormozgan, Iran",
             "postalCode": "",
@@ -29,9 +29,9 @@
         "maritalStatus": "Single",
         "militaryStatus": "Conscript"
     },
-    "aboutText1": "Hello! I'm Mohammad Amin Vakili, a software engineer with hands-on experience in automation, backend development, and server-side engineering.",
-    "aboutText2": "I work with Python, Django, Flask, Vue.js, Electron.js, and databases like MariaDB and PostgreSQL. I have designed internal portals, backend services, IoT data pipelines, and real-time processing systems.",
-    "aboutText3": "I'm passionate about building efficient systems, contributing to open-source, managing servers, and applying modern backend technologies to solve real problems.",
+    "aboutText1": "I'm Mohammad Amin Vakili, a software engineer from Bandar Abbas, Iran. I got my start in networking and IT support in 2017, and that infrastructure background still shapes how I build software: practical, observable, and easy to operate.",
+    "aboutText2": "These days most of my work is Python. With Django and Flask I've built internal portals, REST APIs, an OPC UA data-logging system for industrial equipment, an MQTT pipeline for electricity meter data, and IoT backends for devices like cooling controllers. On the frontend I use Vue.js and Electron — including POS-connected ticketing software — and I publish Grafana dashboards on top of MariaDB and PostgreSQL.",
+    "aboutText3": "I also run the infrastructure behind my projects: MikroTik routing and firewalls, Linux servers, Nginx and Apache, cron jobs, and monitoring. I like taking a slow manual process and turning it into something automated that just runs.",
     "experiences": [
         {
             "title": "IT Expert",

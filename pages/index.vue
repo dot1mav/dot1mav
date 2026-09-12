@@ -2,34 +2,68 @@
   <div id="app">
     <!-- Terminal Boot Sequence -->
     <Transition name="boot-fade">
-      <div v-if="booting" class="boot-screen">
+      <div v-if="bootState === 'running'" class="boot-screen">
         <div class="boot-terminal">
           <div class="boot-header">
             <span class="boot-header-title">MAV Portfolio OS v1.0</span>
           </div>
-          <div class="boot-output" ref="bootOutputEl">
+          <div class="boot-output" ref="bootOutputEl" role="log" aria-live="polite">
             <div v-for="(line, i) in bootLines" :key="i" :class="['boot-line', line.type]">
               {{ line.text }}
             </div>
-            <span v-if="booting" class="boot-cursor">█</span>
+            <span v-if="bootState === 'running'" class="boot-cursor">█</span>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- Boot Error Screen -->
+    <Transition name="boot-fade">
+      <div v-if="bootState === 'error'" class="boot-screen boot-error-screen">
+        <div class="boot-terminal boot-error-terminal">
+          <div class="boot-header boot-error-header">
+            <span class="boot-header-title">MAV Portfolio OS v1.0 - SYSTEM HALTED</span>
+          </div>
+          <div class="boot-output" role="alert">
+            <div class="boot-line error">SYSTEM BOOT FAILED</div>
+            <div class="boot-line dim">{{ bootError }}</div>
+            <div class="boot-line dim"></div>
+            <div class="boot-line out">The portfolio API could not be reached or returned invalid data.</div>
+            <div class="boot-line out">This usually means:</div>
+            <div class="boot-line info">  • Server is temporarily unavailable</div>
+            <div class="boot-line info">  • Network connection issue</div>
+            <div class="boot-line info">  • API endpoint has changed</div>
+            <div class="boot-line dim"></div>
+            <div class="boot-line accent">Press [R] to retry boot sequence</div>
+            <div class="boot-line accent">Press [C] to contact site admin (opens GitHub)</div>
+            <div class="boot-line dim"></div>
+            <div class="boot-line dim">Error details: {{ errorDetails }}</div>
+            <span class="boot-cursor">█</span>
           </div>
         </div>
       </div>
     </Transition>
 
     <!-- Desktop -->
-    <main id="desktop" class="desktop" aria-label="Desktop" v-show="!booting">
-      <DesktopIcon
-        v-for="icon in desktopIcons"
-        :key="icon.id"
-        :icon="icon.icon"
-        :label="icon.label"
-        @open="openWindow(icon.id)"
-      />
+    <main id="desktop" class="desktop" aria-label="Desktop" v-show="bootState === 'ready'">
+      <div 
+        class="desktop-bg" 
+        @contextmenu.prevent="showDesktopContextMenu"
+        @click="hideContextMenu"
+      >
+        <DesktopIcon
+          v-for="icon in desktopIcons"
+          :key="icon.id"
+          :icon="icon.icon"
+          :label="icon.label"
+          @open="openWindow(icon.id)"
+          @contextmenu="showIconContextMenu"
+        />
+      </div>
     </main>
 
     <!-- Windows -->
-    <div v-show="!booting">
+    <div v-show="bootState === 'ready'">
       <OSWindow v-for="id in windowIds" :key="id" :id="id" :full-body="id === 'terminal'">
         <ProjectsWindow v-if="id === 'projects'" />
         <ExperiencesWindow v-else-if="id === 'experiences'" />
@@ -43,22 +77,30 @@
         <PhotoViewerWindow v-else-if="id === 'photos'" />
         <VideoPlayerWindow v-else-if="id === 'video'" />
         <MinesweeperWindow v-else-if="id === 'minesweeper'" />
+        <SolitaireWindow v-else-if="id === 'solitaire'" />
       </OSWindow>
     </div>
 
-    <Taskbar v-show="!booting" />
+    <!-- Taskbar -->
+    <Taskbar v-show="bootState === 'ready'" :start-menu-open="startMenuOpen" @toggle-start="toggleStartMenu" @start-action="handleStartAction" />
+
+    <!-- Context Menu -->
+    <ContextMenu v-if="contextMenu.visible" :items="contextMenu.items" :position="contextMenu.position" @close="hideContextMenu" @action="handleContextAction" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { useWindows } from '../composables/useWindows'
 import { useApp } from '../composables/useApp'
 import { useSourceGuards } from '../composables/useSourceGuards'
+import { useSiteData } from '../composables/useSiteData'
 
-const booting = ref(true)
+const bootState = ref('running') // 'running' | 'ready' | 'error'
 const bootLines = ref([])
 const bootOutputEl = ref(null)
+const bootError = ref('')
+const errorDetails = ref('')
 
 const {
   windows,
@@ -68,8 +110,10 @@ const {
   installKeyboardShortcuts,
   removeKeyboardShortcuts,
 } = useWindows()
+
 const { initDarkMode } = useApp()
 const { install: installSourceGuards, remove: removeSourceGuards } = useSourceGuards()
+const { rehydrate } = useSiteData()
 
 const windowIds = Object.keys(windows)
 
@@ -85,148 +129,11 @@ const desktopIcons = [
   { id: 'photos', icon: '/images/icons/photos.png', label: 'Photo Viewer' },
   { id: 'video', icon: '/images/icons/video.png', label: 'Video Player' },
   { id: 'minesweeper', icon: '/images/icons/paint.png', label: 'Minesweeper' },
+  { id: 'solitaire', icon: '/images/icons/solitaire.png', label: 'Solitaire' },
 ]
 
-const BOOT_SCRIPT = [
-  // BIOS
-  { text: 'MAV Portfolio OS v1.0 [Build 2026.08.23]', type: 'info', delay: 120 },
-  { text: 'Copyright (c) 2026 dot1mav. All rights reserved.', type: 'dim', delay: 80 },
-  { text: '', type: 'dim', delay: 50 },
-  { text: 'BIOS Date: 08/23/2026  Ver: 1.0.4', type: 'dim', delay: 100 },
-  { text: 'Mainboard: Virtual DOM Corp. Model Nuxt-3', type: 'dim', delay: 80 },
-  { text: '', type: 'dim', delay: 50 },
-
-  // Hardware detection
-  { text: 'Detecting hardware...', type: 'out', delay: 400 },
-  { text: '  CPU: Software Engineer v3.0 @ max效能', type: 'dim', delay: 180 },
-  { text: '  RAM: 640K (ought to be enough)', type: 'dim', delay: 150 },
-  { text: '  GPU: Creativity Engine (RTX vibes)', type: 'dim', delay: 130 },
-  { text: '  Sound: MS-DOS Beeper (8-bit glory)', type: 'dim', delay: 120 },
-  { text: '  Network: dot1mav.eth (100 Gbps vibes)', type: 'dim', delay: 110 },
-  { text: '', type: 'dim', delay: 50 },
-
-  // Storage mounting
-  { text: 'Mounting storage devices...', type: 'out', delay: 350 },
-  { text: '  Mounting C: [System Drive] (SSD 512GB)', type: 'info', delay: 200 },
-  { text: '  >> C: mounted successfully', type: 'ok', delay: 150 },
-  { text: '  Mounting D: [Projects Drive] (HDD 2TB)', type: 'info', delay: 250 },
-  { text: '  >> D: mounted successfully', type: 'ok', delay: 150 },
-  { text: '  Mounting E: [Media Drive] (NVMe 1TB)', type: 'info', delay: 220 },
-  { text: '  >> E: mounted successfully', type: 'ok', delay: 140 },
-  { text: '  Mounting F: [Backup Drive] (Cloud 10TB)', type: 'info', delay: 300 },
-  { text: '  >> F: mounted successfully', type: 'ok', delay: 150 },
-  { text: '', type: 'dim', delay: 50 },
-
-  // Disk checks
-  { text: 'Running disk checks...', type: 'out', delay: 350 },
-  { text: '  C:\\> chkdsk /f', type: 'info', delay: 250 },
-  { text: '  >> 0 bad sectors found', type: 'ok', delay: 180 },
-  { text: '  >> File system: FAT32 (integrity OK)', type: 'ok', delay: 150 },
-  { text: '  D:\\> chkdsk /f', type: 'info', delay: 220 },
-  { text: '  >> 0 bad sectors found', type: 'ok', delay: 160 },
-  { text: '  >> File system: NTFS (integrity OK)', type: 'ok', delay: 140 },
-  { text: '', type: 'dim', delay: 50 },
-
-  // Security checks
-  { text: 'Initializing security modules...', type: 'out', delay: 400 },
-  { text: '  [OK] Session Manager v2.1 loaded', type: 'ok', delay: 150 },
-  { text: '  [OK] CSRF Token Generator initialized', type: 'ok', delay: 130 },
-  { text: '  [OK] XSS Filter active', type: 'ok', delay: 120 },
-  { text: '  [OK] Content Security Policy enforced', type: 'ok', delay: 110 },
-  { text: '  [OK] HTTPS-only mode enabled', type: 'ok', delay: 100 },
-  { text: '', type: 'dim', delay: 50 },
-
-  // URL & session security
-  { text: 'Running security scans...', type: 'out', delay: 450 },
-  { text: '  Checking URL integrity...', type: 'info', delay: 250 },
-  { text: '  >> Protocol: HTTPS (secure)', type: 'ok', delay: 160 },
-  { text: '  >> Domain: dot1mav.ir (verified)', type: 'ok', delay: 150 },
-  { text: '  >> SSL Certificate: Valid ( expires 2027)', type: 'ok', delay: 200 },
-  { text: '  >> HSTS header: max-age=31536000', type: 'ok', delay: 140 },
-  { text: '', type: 'dim', delay: 50 },
-  { text: '  Checking session security...', type: 'info', delay: 250 },
-  { text: '  >> Session ID: 48 random bytes (secure)', type: 'ok', delay: 160 },
-  { text: '  >> HttpOnly flag: ENABLED', type: 'ok', delay: 140 },
-  { text: '  >> Secure flag: ENABLED', type: 'ok', delay: 130 },
-  { text: '  >> SameSite: Strict', type: 'ok', delay: 120 },
-  { text: '  >> Session timeout: 30 min', type: 'ok', delay: 110 },
-  { text: '', type: 'dim', delay: 50 },
-
-  // Module loading
-  { text: 'Loading system modules...', type: 'out', delay: 350 },
-  { text: '  [OK] DOM Manipulator v3.2.1', type: 'ok', delay: 140 },
-  { text: '  [OK] CSS Renderer (Win98 mode)', type: 'ok', delay: 130 },
-  { text: '  [OK] Keyboard Handler v1.4.0', type: 'ok', delay: 120 },
-  { text: '  [OK] Window Manager (draggable)', type: 'ok', delay: 115 },
-  { text: '  [OK] Event Delegation Engine', type: 'ok', delay: 110 },
-  { text: '  [OK] Virtual Scroll Optimizer', type: 'ok', delay: 105 },
-  { text: '  [OK] Image Lazy Loader v2.0', type: 'ok', delay: 100 },
-  { text: '  [OK] Service Worker (offline cache)', type: 'ok', delay: 95 },
-  { text: '', type: 'dim', delay: 50 },
-
-  // Network & API
-  { text: 'Connecting to portfolio API...', type: 'out', delay: 500 },
-  { text: '  DNS lookup: dot1mav.ir ...', type: 'info', delay: 250 },
-  { text: '  >> Resolved: 185.199.108.153', type: 'ok', delay: 180 },
-  { text: '  TCP handshake ...', type: 'info', delay: 300 },
-  { text: '  >> Connection established (TLS 1.3)', type: 'ok', delay: 200 },
-  { text: '  GET /api/data ...', type: 'info', delay: 600 },
-  { text: '  >> 200 OK (18.4 KB, 142ms)', type: 'ok', delay: 200 },
-  { text: '', type: 'dim', delay: 50 },
-
-  // Data fetching
-  { text: 'Fetching portfolio data...', type: 'out', delay: 400 },
-  { text: '  GET /api/data/projects ...', type: 'info', delay: 350 },
-  { text: '  >> 12 projects loaded', type: 'ok', delay: 180 },
-  { text: '  GET /api/data/skills ...', type: 'info', delay: 300 },
-  { text: '  >> 6 skill categories loaded', type: 'ok', delay: 160 },
-  { text: '  GET /api/data/experiences ...', type: 'info', delay: 280 },
-  { text: '  >> 3 experiences loaded', type: 'ok', delay: 150 },
-  { text: '  GET /api/data/certifications ...', type: 'info', delay: 260 },
-  { text: '  >> 5 certifications loaded', type: 'ok', delay: 140 },
-  { text: '  GET /api/data/contact ...', type: 'info', delay: 240 },
-  { text: '  >> Contact info loaded', type: 'ok', delay: 130 },
-  { text: '  GET /api/data/photos ...', type: 'info', delay: 300 },
-  { text: '  >> 8 photos loaded', type: 'ok', delay: 150 },
-  { text: '  GET /api/data/videos ...', type: 'info', delay: 280 },
-  { text: '  >> 3 videos loaded', type: 'ok', delay: 140 },
-  { text: '', type: 'dim', delay: 50 },
-
-  // Sanity checks
-  { text: 'Running sanity checks...', type: 'out', delay: 400 },
-  { text: '  Checking project images...', type: 'info', delay: 200 },
-  { text: '  >> All 12 thumbnails accessible', type: 'ok', delay: 180 },
-  { text: '  Checking resume file...', type: 'info', delay: 200 },
-  { text: '  >> resume.pdf (245 KB) - OK', type: 'ok', delay: 160 },
-  { text: '  Checking external links...', type: 'info', delay: 250 },
-  { text: '  >> github.com/dot1mav - reachable', type: 'ok', delay: 200 },
-  { text: '  >> linkedin.com/in/dot1mav - reachable', type: 'ok', delay: 180 },
-  { text: '', type: 'dim', delay: 50 },
-
-  // Performance
-  { text: 'Performance metrics...', type: 'out', delay: 350 },
-  { text: '  First Contentful Paint: 0.8s', type: 'dim', delay: 160 },
-  { text: '  Largest Contentful Paint: 1.2s', type: 'dim', delay: 150 },
-  { text: '  Cumulative Layout Shift: 0.01', type: 'dim', delay: 140 },
-  { text: '  Time to Interactive: 1.4s', type: 'dim', delay: 130 },
-  { text: '  Lighthouse Score: 98/100', type: 'ok', delay: 180 },
-  { text: '', type: 'dim', delay: 50 },
-
-  // Desktop init
-  { text: 'Initializing desktop environment...', type: 'out', delay: 400 },
-  { text: '  [OK] Windows 98 theme loaded', type: 'ok', delay: 140 },
-  { text: '  [OK] Custom cursor initialized', type: 'ok', delay: 130 },
-  { text: '  [OK] Particle effects ready', type: 'ok', delay: 120 },
-  { text: '  [OK] Dark mode preference set', type: 'ok', delay: 110 },
-  { text: '  [OK] Taskbar icons rendered', type: 'ok', delay: 105 },
-  { text: '  [OK] Desktop icons positioned', type: 'ok', delay: 100 },
-  { text: '  [OK] Window manager ready', type: 'ok', delay: 95 },
-  { text: '', type: 'dim', delay: 50 },
-
-  // Final
-  { text: 'All systems nominal. Launching desktop...', type: 'accent', delay: 600 },
-  { text: '', type: 'dim', delay: 200 },
-]
+const startMenuOpen = ref(false)
+const contextMenu = ref({ visible: false, items: [], position: { x: 0, y: 0 }, target: null })
 
 function scrollToBottom() {
   nextTick(() => {
@@ -236,24 +143,339 @@ function scrollToBottom() {
   })
 }
 
-function runBootSequence() {
-  let totalDelay = 0
-  BOOT_SCRIPT.forEach((item) => {
-    totalDelay += item.delay
+function addBootLine(text, type = 'out', delay = 0) {
+  return new Promise(resolve => {
     setTimeout(() => {
-      bootLines.value.push({ text: item.text, type: item.type })
+      bootLines.value.push({ text, type })
       scrollToBottom()
-    }, totalDelay)
+      resolve()
+    }, delay)
   })
-  // After all lines printed, wait a moment then finish
-  setTimeout(() => {
-    booting.value = false
+}
+
+async function runBootSequence() {
+  bootLines.value = []
+  bootError.value = ''
+  errorDetails.value = ''
+
+  try {
+    // BIOS
+    await addBootLine('MAV Portfolio OS v1.0 [Build 2026.08.23]', 'info', 120)
+    await addBootLine('Copyright (c) 2026 dot1mav. All rights reserved.', 'dim', 80)
+    await addBootLine('', 'dim', 50)
+    await addBootLine('BIOS Date: 08/23/2026  Ver: 1.0.4', 'dim', 100)
+    await addBootLine('Mainboard: Virtual DOM Corp. Model Nuxt-3', 'dim', 80)
+    await addBootLine('', 'dim', 50)
+
+    // Hardware detection
+    await addBootLine('Detecting hardware…', 'out', 400)
+    await addBootLine('  CPU: Software Engineer v3.0 @ max效能', 'dim', 180)
+    await addBootLine('  RAM: 640K (ought to be enough)', 'dim', 150)
+    await addBootLine('  GPU: Creativity Engine (RTX vibes)', 'dim', 130)
+    await addBootLine('  Sound: MS-DOS Beeper (8-bit glory)', 'dim', 120)
+    await addBootLine('  Network: dot1mav.eth (100 Gbps vibes)', 'dim', 110)
+    await addBootLine('', 'dim', 50)
+
+    // Health check API
+    await addBootLine('Connecting to portfolio API…', 'out', 500)
+    await addBootLine('  DNS lookup: dot1mav.ir …', 'info', 250)
+    
+    const healthStart = Date.now()
+    const healthRes = await fetch('/api/health')
+    const healthLatency = Date.now() - healthStart
+    
+    await addBootLine(`  >> Resolved: 185.199.108.153 (${healthLatency}ms)`, 'ok', 180)
+    await addBootLine('  TCP handshake …', 'info', 300)
+    
+    if (!healthRes.ok) {
+      throw new Error(`Health check failed: ${healthRes.status} ${healthRes.statusText}`)
+    }
+    
+    const health = await healthRes.json()
+    await addBootLine(`  >> Connection established (TLS 1.3, ${healthLatency}ms)`, 'ok', 200)
+    await addBootLine(`  GET /api/health …`, 'info', 300)
+    await addBootLine(`  >> 200 OK (${JSON.stringify(health).length} bytes, ${healthLatency}ms)`, 'ok', 200)
+    await addBootLine('', 'dim', 50)
+
+    // Check health status
+    if (health.status !== 'healthy') {
+      await addBootLine('WARNING: System health degraded', 'accent', 400)
+      for (const [key, check] of Object.entries(health.checks)) {
+        if (check.status !== 'ok') {
+          await addBootLine(`  [FAIL] ${key}: ${check.status}`, 'error', 200)
+        }
+      }
+    }
+
+    // Data fetching with real counts
+    await addBootLine('Fetching portfolio data…', 'out', 400)
+    
+    const dataStart = Date.now()
+    const dataRes = await fetch('/api/data')
+    const dataLatency = Date.now() - dataStart
+    
+    if (!dataRes.ok) {
+      throw new Error(`Data fetch failed: ${dataRes.status} ${dataRes.statusText}`)
+    }
+    
+    const data = await dataRes.json()
+    await addBootLine(`  GET /api/data …`, 'info', 350)
+    await addBootLine(`  >> 200 OK (${(JSON.stringify(data).length / 1024).toFixed(1)} KB, ${dataLatency}ms)`, 'ok', 200)
+    
+    if (data.projects) {
+      await addBootLine(`  >> ${data.projects.length} projects loaded`, 'ok', 180)
+    }
+    if (data.experiences) {
+      await addBootLine(`  >> ${data.experiences.length} experiences loaded`, 'ok', 160)
+    }
+    if (data.skills) {
+      await addBootLine(`  >> ${Object.keys(data.skills).length} skill categories loaded`, 'ok', 160)
+    }
+    if (data.certifications) {
+      await addBootLine(`  >> ${data.certifications.length} certifications loaded`, 'ok', 140)
+    }
+    if (data.photos) {
+      await addBootLine(`  >> ${data.photos.length} photos loaded`, 'ok', 150)
+    }
+    if (data.videos) {
+      await addBootLine(`  >> ${data.videos.length} videos loaded`, 'ok', 140)
+    }
+    await addBootLine('', 'dim', 50)
+
+    // Sanity checks
+    await addBootLine('Running sanity checks…', 'out', 400)
+    await addBootLine('  Checking project images…', 'info', 200)
+    
+    if (data.projects) {
+      let imgCount = 0
+      for (const p of data.projects) {
+        if (p.images) imgCount += p.images.length
+      }
+      await addBootLine(`  >> ${imgCount} project images accessible`, 'ok', 180)
+    }
+    
+    await addBootLine('  Checking resume file…', 'info', 200)
+    await addBootLine('  >> resume.pdf (245 KB) - OK', 'ok', 160)
+    await addBootLine('  Checking external links…', 'info', 250)
+    await addBootLine('  >> github.com/dot1mav - reachable', 'ok', 200)
+    await addBootLine('  >> linkedin.com/in/dot1mav - reachable', 'ok', 180)
+    await addBootLine('', 'dim', 50)
+
+    // Performance (simulated but realistic)
+    await addBootLine('Performance metrics…', 'out', 350)
+    await addBootLine(`  First Contentful Paint: ~${(performance.now() / 1000).toFixed(1)}s`, 'dim', 160)
+    await addBootLine(`  API Health Latency: ${healthLatency}ms`, 'dim', 150)
+    await addBootLine(`  Data Fetch Latency: ${dataLatency}ms`, 'dim', 140)
+    await addBootLine(`  Total Boot Time: ${((Date.now() - performance.timeOrigin) / 1000).toFixed(1)}s`, 'dim', 130)
+    await addBootLine('', 'dim', 50)
+
+    // Desktop init
+    await addBootLine('Initializing desktop environment…', 'out', 400)
+    await addBootLine('  [OK] Windows 98 theme loaded', 'ok', 140)
+    await addBootLine('  [OK] Custom cursor initialized', 'ok', 130)
+    await addBootLine('  [OK] Particle effects ready', 'ok', 120)
+    await addBootLine('  [OK] Dark mode preference set', 'ok', 110)
+    await addBootLine('  [OK] Taskbar icons rendered', 'ok', 105)
+    await addBootLine('  [OK] Desktop icons positioned', 'ok', 100)
+    await addBootLine('  [OK] Window manager ready', 'ok', 95)
+    await addBootLine('  [OK] Context menu system ready', 'ok', 90)
+    await addBootLine('  [OK] Start menu ready', 'ok', 85)
+    await addBootLine('', 'dim', 50)
+
+    // Final
+    await addBootLine('All systems nominal. Launching desktop…', 'accent', 600)
+    await addBootLine('', 'dim', 200)
+
+    // Success - transition to desktop
+    bootState.value = 'ready'
     installSourceGuards()
     initDarkMode()
     layoutWindowsForMobile()
     installKeyboardShortcuts()
     window.addEventListener('resize', handleWindowResize)
-  }, totalDelay + 400)
+    window.addEventListener('keydown', handleBootKeys)
+    
+  } catch (err) {
+    // Boot failed
+    bootState.value = 'error'
+    bootError.value = err.message || 'Unknown error'
+    errorDetails.value = err.stack || ''
+    console.error('[Boot] Failed:', err)
+    
+    // Listen for retry keys
+    window.addEventListener('keydown', handleBootKeys)
+  }
+}
+
+function handleBootKeys(e) {
+  if (bootState.value !== 'error') return
+  if (e.key.toLowerCase() === 'r') {
+    // Retry
+    bootState.value = 'running'
+    runBootSequence()
+  } else if (e.key.toLowerCase() === 'c') {
+    // Contact admin
+    window.open('https://github.com/dot1mav/dot1mav/issues/new', '_blank')
+  }
+}
+
+function toggleStartMenu() {
+  startMenuOpen.value = !startMenuOpen.value
+}
+
+function handleStartAction(action) {
+  startMenuOpen.value = false
+  switch (action) {
+    case 'projects':
+    case 'experiences':
+    case 'skills':
+    case 'certifications':
+    case 'contact':
+    case 'about':
+    case 'terminal':
+    case 'svgcreator':
+    case 'photos':
+    case 'video':
+    case 'minesweeper':
+    case 'solitaire':
+      openWindow(action)
+      break
+    case 'shutdown':
+      if (confirm('Shut down MAV Portfolio OS?')) {
+        window.close()
+      }
+      break
+    case 'restart':
+      if (confirm('Restart MAV Portfolio OS?')) {
+        location.reload()
+      }
+      break
+    case 'darkmode':
+      useApp().toggleDarkMode()
+      break
+  }
+}
+
+function showDesktopContextMenu(e) {
+  e.preventDefault()
+  contextMenu.value = {
+    visible: true,
+    position: { x: e.clientX, y: e.clientY },
+    items: [
+      { label: 'Refresh', action: 'refresh', icon: '🔄' },
+      { separator: true },
+      { label: 'New', action: null, submenu: [
+        { label: 'Folder', action: 'new_folder' },
+        { label: 'Shortcut', action: 'new_shortcut' },
+        { label: 'Text Document', action: 'new_text' },
+      ]},
+      { separator: true },
+      { label: 'Paste', action: 'paste', disabled: true },
+      { label: 'Paste Shortcut', action: 'paste_shortcut', disabled: true },
+      { separator: true },
+      { label: 'Arrange Icons', action: 'arrange' },
+      { label: 'Line Up Icons', action: 'lineup' },
+      { separator: true },
+      { label: 'Properties', action: 'desktop_props' },
+    ],
+    target: 'desktop',
+  }
+}
+
+function showIconContextMenu(e, icon) {
+  e.preventDefault()
+  e.stopPropagation()
+  contextMenu.value = {
+    visible: true,
+    position: { x: e.clientX, y: e.clientY },
+    items: [
+      { label: 'Open', action: 'open', default: true, iconData: icon },
+      { separator: true },
+      { label: 'Create Shortcut', action: 'create_shortcut', iconData: icon },
+      { label: 'Delete', action: 'delete_icon', iconData: icon },
+      { separator: true },
+      { label: 'Rename', action: 'rename', iconData: icon },
+      { separator: true },
+      { label: 'Properties', action: 'icon_props', iconData: icon },
+    ],
+    target: 'icon',
+    iconData: icon,
+  }
+}
+
+function showWindowContextMenu(e, windowId) {
+  e.preventDefault()
+  e.stopPropagation()
+  const win = windows[windowId]
+  if (!win) return
+  contextMenu.value = {
+    visible: true,
+    position: { x: e.clientX, y: e.clientY },
+    items: [
+      { label: 'Restore', action: 'restore', disabled: !win.minimized && !win.maximized },
+      { label: 'Move', action: 'move' },
+      { label: 'Size', action: 'size' },
+      { label: 'Minimize', action: 'minimize' },
+      { label: 'Maximize', action: 'maximize', disabled: win.maximized },
+      { separator: true },
+      { label: 'Close', action: 'close', danger: true },
+    ],
+    target: 'window',
+    windowId,
+  }
+}
+
+function hideContextMenu() {
+  contextMenu.value.visible = false
+}
+
+function handleContextAction(action, data) {
+  hideContextMenu()
+  switch (action) {
+    case 'refresh':
+      location.reload()
+      break
+    case 'open':
+      if (data?.id) openWindow(data.id)
+      break
+    case 'desktop_props':
+      openWindow('about')
+      break
+    case 'icon_props':
+      if (data?.id) openWindow('about')
+      break
+    // Window actions
+    case 'restore':
+      if (data?.windowId) {
+        const { restoreWindow } = useWindows()
+        restoreWindow(data.windowId)
+      }
+      break
+    case 'move':
+      // Would need keyboard-driven move mode
+      break
+    case 'size':
+      // Would need keyboard-driven size mode
+      break
+    case 'minimize':
+      if (data?.windowId) {
+        const { minimizeWindow } = useWindows()
+        minimizeWindow(data.windowId)
+      }
+      break
+    case 'maximize':
+      if (data?.windowId) {
+        const { maximizeWindow } = useWindows()
+        maximizeWindow(data.windowId)
+      }
+      break
+    case 'close':
+      if (data?.windowId) {
+        const { closeWindow } = useWindows()
+        closeWindow(data.windowId)
+      }
+      break
+  }
 }
 
 onMounted(() => {
@@ -264,6 +486,7 @@ onBeforeUnmount(() => {
   removeSourceGuards()
   removeKeyboardShortcuts()
   window.removeEventListener('resize', handleWindowResize)
+  window.removeEventListener('keydown', handleBootKeys)
 })
 </script>
 
@@ -282,7 +505,7 @@ onBeforeUnmount(() => {
 
 .boot-terminal {
   width: 100%;
-  max-width: 600px;
+  max-width: 720px;
   background: #000;
   font-family: 'IBM Plex Mono', 'Consolas', 'Courier New', monospace;
   font-size: 13px;
@@ -303,8 +526,8 @@ onBeforeUnmount(() => {
 }
 
 .boot-output {
-  max-height: 70vh;
-  overflow: hidden;
+  max-height: 75vh;
+  overflow: auto;
   padding: 0 2px;
 }
 
@@ -319,6 +542,7 @@ onBeforeUnmount(() => {
 .boot-line.out { color: #aaa; }
 .boot-line.ok { color: #5f5; }
 .boot-line.accent { color: #ff5; }
+.boot-line.error { color: #f55; font-weight: bold; }
 
 .boot-cursor {
   color: #aaa;
@@ -336,11 +560,31 @@ onBeforeUnmount(() => {
   opacity: 0;
 }
 
+.boot-error-screen {
+  background: #000080;
+}
+.boot-error-terminal {
+  border: 2px solid #fff;
+  max-width: 760px;
+}
+.boot-error-header {
+  background: #c00;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .boot-cursor { animation: none; }
 }
 
 @media (max-width: 480px) {
   .boot-terminal { font-size: 11px; }
+  .boot-error-terminal { font-size: 11px; }
+}
+
+/* Desktop background */
+.desktop-bg {
+  width: 100%;
+  height: 100%;
+  background: #008080;
+  position: relative;
 }
 </style>

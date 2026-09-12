@@ -7,9 +7,13 @@
     "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test": "vitest run"
   },
   "dependencies": {
     "nuxt": "^3.17.0"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.11"
   }
 }

@@ -1,18 +1,30 @@
-// Client-side access to the portfolio data.
-//
-// Fetches from the Django REST API backend, with fallback to bundled
-// JSON for static hosting (gh-pages) where no backend is available.
+// Client-side adapter for the Django portfolio API (NUXT_PUBLIC_API_BASE).
+// Backend-only by design: there is no bundled fallback, so a dead
+// backend means empty data rather than stale content.
 
-import localData from '../public/data.json'
-
-const API_BASE = 'http://127.0.0.1:8000/v0'
+// useRuntimeConfig is a Nuxt auto-import that only exists inside the app
+// context, so resolve the API base lazily. The fallback mirrors the default
+// in nuxt.config.ts so plain Node/vitest imports still work.
+let _apiBase
+function apiBase() {
+  if (_apiBase === undefined) {
+    if (typeof useRuntimeConfig === 'function') {
+      _apiBase = useRuntimeConfig().public.apiBase
+    } else {
+      _apiBase =
+        (typeof process !== 'undefined' && process.env?.NUXT_PUBLIC_API_BASE) ||
+        'http://127.0.0.1:8000/v0'
+    }
+  }
+  return _apiBase
+}
 
 async function fetchJson(path) {
   try {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), 5000)
 
-    const res = await fetch(`${API_BASE}${path}`, {
+    const res = await fetch(`${apiBase()}${path}`, {
       signal: controller.signal,
       headers: { Accept: 'application/json' },
     })
@@ -39,13 +51,14 @@ export async function fetchProjects() {
       tech_stack: p.tech_stack || '',
       image: p.image_url || '',
       images: p.images || [],
+      video: p.video || '',
       demo_link: p.demo_link || '',
       source_link: p.source_link || '',
       date: p.date || '',
       is_featured: p.is_featured || false,
     }))
   }
-  return localData.projects ?? []
+  return []
 }
 
 // --- Experiences ---
@@ -64,7 +77,7 @@ export async function fetchExperiences() {
       duties: e.description ? e.description.split('\n').filter(Boolean) : [],
     }))
   }
-  return localData.experiences ?? []
+  return []
 }
 
 // --- Skills ---
@@ -86,7 +99,7 @@ export async function fetchSkills() {
     }
     return skills
   }
-  return localData.skills ?? {}
+  return {}
 }
 
 // --- Certifications ---
@@ -101,7 +114,7 @@ export async function fetchCertifications() {
       image: c.image_url || '',
     }))
   }
-  return localData.certifications ?? []
+  return []
 }
 
 // --- About / Profile ---
@@ -115,6 +128,7 @@ export async function fetchAbout() {
         email: data.email || '',
         phone: data.phone || '',
         website: data.website_url || '',
+        resume_url: data.resume_url || '',
         summary: data.bio_full || data.bio_short || '',
         location: {
           address: data.location || '',
@@ -157,6 +171,7 @@ export async function fetchSiteData() {
         email: profile.email || '',
         phone: profile.phone || '',
         website: profile.website_url || '',
+        resume_url: profile.resume_url || '',
         summary: profile.bio_full || profile.bio_short || '',
         location: { address: profile.location || '' },
         profiles: [
@@ -176,6 +191,8 @@ export async function fetchSiteData() {
         description_full: p.description_full || '',
         tech_stack: p.tech_stack || '',
         image: p.image_url || '',
+        images: p.images || [],
+        video: p.video || '',
         demo_link: p.demo_link || '',
         source_link: p.source_link || '',
         date: p.date || '',
@@ -191,7 +208,11 @@ export async function fetchSiteData() {
         title: e.title,
         company: e.company,
         location: e.location,
-        dates: e.end_date ? `${formatDate(e.start_date)} – ${formatDate(e.end_date)}` : `${formatDate(e.start_date)} – Present`,
+        dates: e.end_date
+          ? `${formatDate(e.start_date)} – ${formatDate(e.end_date)}`
+          : e.is_current
+            ? `${formatDate(e.start_date)} – Present`
+            : formatDate(e.start_date),
         duties: e.description ? e.description.split('\n').filter(Boolean) : [],
       })),
       certifications: (certifications || []).map((c) => ({
@@ -203,7 +224,7 @@ export async function fetchSiteData() {
       })),
     }
   }
-  return localData
+  return { basics: {}, aboutText1: '', aboutText2: '', aboutText3: '' }
 }
 
 // --- Photos ---
@@ -217,17 +238,6 @@ export async function fetchPhotos(project) {
         if (project && p.title !== project) continue
         photos.push({ src, project: p.title })
       }
-    }
-  }
-  return photos.length ? photos : localPhotos()
-}
-
-function localPhotos() {
-  const photos = []
-  for (const p of localData.projects || []) {
-    for (const src of p.images || []) {
-      if (!src || src.includes('/images/background')) continue
-      photos.push({ src, project: p.title })
     }
   }
   return photos

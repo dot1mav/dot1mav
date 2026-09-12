@@ -194,8 +194,7 @@ const {
 .terminal-output {
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   padding: 6px 8px;
   white-space: pre-wrap;
   word-break: break-word;

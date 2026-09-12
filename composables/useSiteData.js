@@ -1,26 +1,27 @@
-// Everything in data.json.
-//
-// Renders instantly from the bundled copy (SSR + static hosting),
-// then hydrates from /api/data on the client when a real server is
-// answering. Components read through here, so the source swap is
-// invisible to them — identical shapes either way.
-//
-// Hydration mutates the reactive object in place (assign/merge, never
-// re-assign) so any component that grabbed a reference keeps seeing
-// the fresh data.
+// Everything in data.json — now fetched from API only.
+// The server serves the same data, but the client talks to /api/data.
+// Hydration mutates the reactive object in place so references stay valid.
 import { reactive } from 'vue'
-import { fetchSiteData } from '../services/portfolio'
-import bundledSiteData from '../public/data.json'
 
-const siteData = reactive({ ...bundledSiteData })
+const siteData = reactive({
+  basics: {},
+  aboutText1: '',
+  aboutText2: '',
+  aboutText3: '',
+  experiences: [],
+  projects: [],
+  certifications: [],
+  skills: {},
+  languages: {},
+})
 
 let hydratePromise = null
+let hydrateError = null
 
 function mergeInto(target, source) {
   for (const [key, value] of Object.entries(source)) {
     const existing = target[key]
     if (existing && value && typeof existing === 'object' && typeof value === 'object' && !Array.isArray(existing) && !Array.isArray(value)) {
-      // Nested objects merge in place so references stay valid.
       mergeInto(existing, value)
     } else if (Array.isArray(value) && Array.isArray(existing)) {
       target[key].splice(0, target[key].length, ...value)
@@ -30,21 +31,54 @@ function mergeInto(target, source) {
   }
 }
 
+async function fetchFromAPI() {
+  const base = '/api/data'
+  const res = await fetch(base)
+  if (!res.ok) {
+    throw new Error(`API ${res.status}: ${res.statusText}`)
+  }
+  return res.json()
+}
+
 export function useSiteData() {
-  // Only the client talks to the API; the server keeps the bundled
-  // copy so the first paint and static hosting work unchanged.
-  if (typeof window !== 'undefined' && !hydratePromise) {
-    hydratePromise = fetchSiteData()
+  // Client-only: hydrate from API on first access
+  if (typeof window !== 'undefined' && !hydratePromise && !hydrateError) {
+    hydratePromise = fetchFromAPI()
       .then((fresh) => {
         if (fresh && typeof fresh === 'object') {
           mergeInto(siteData, fresh)
         }
+        hydrateError = null
       })
-      .catch(() => {})
+      .catch((err) => {
+        hydrateError = err
+        console.error('[useSiteData] API hydration failed:', err)
+      })
       .finally(() => {
         hydratePromise = null
       })
   }
 
-  return siteData
+  return {
+    get data() { return siteData },
+    get isHydrated() { return Object.keys(siteData).some(k => siteData[k] && (Array.isArray(siteData[k]) ? siteData[k].length : Object.keys(siteData[k]).length)) },
+    get hydrateError() { return hydrateError },
+    async rehydrate() {
+      hydrateError = null
+      hydratePromise = fetchFromAPI()
+        .then((fresh) => {
+          if (fresh && typeof fresh === 'object') {
+            mergeInto(siteData, fresh)
+          }
+          hydrateError = null
+        })
+        .catch((err) => {
+          hydrateError = err
+        })
+        .finally(() => {
+          hydratePromise = null
+        })
+      await hydratePromise
+    },
+  }
 }

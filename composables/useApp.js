@@ -5,11 +5,13 @@
 // no access to the Taskbar, and module scope makes that work.
 import { ref } from 'vue'
 import { useAnalytics } from './useAnalytics'
+import { useSiteData } from './useSiteData'
 
 const isDarkMode = ref(false)
 
 export function useApp() {
   const { sendUmamiEvent } = useAnalytics()
+  const siteData = useSiteData()
 
   // Called once on mount. localStorage is only readable on the client,
   // so this stays out of the server render.
@@ -35,7 +37,7 @@ export function useApp() {
   // resume.pdf lives in public/. If you rename or regenerate it,
   // keep the filename here and in the README in sync.
   function downloadResume() {
-    const resumeUrl = 'resume.pdf'
+    const resumeUrl = siteData.basics?.resume_url || '/resume.pdf'
 
     const link = document.createElement('a')
     link.href = resumeUrl

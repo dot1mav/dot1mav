@@ -27,13 +27,16 @@ you can poke at with curl while the site is up.
 Two builds, depending on where it's going:
 
 ```bash
-npm run generate   # static site → .output/public (used for GitHub Pages)
-npm run build      # node server build (needed if you want the /api routes to actually run)
+npm run generate   # static site → .output/public (for static hosting)
+npm run build      # node server build — required: all content comes from
+                   # the Django backend through the /api routes
 ```
 
-`npm run generate` is what gets pushed to `gh-pages`. It prerenders
-`/`, `404.html` and `200.html`, and everything else is client-side.
-The `CNAME` file in `public/` keeps `dot1mav.ir` pointing here.
+`npm run build` + `node .output/server/index.mjs` is the normal way to
+run it (see CPANEL_DEPLOYMENT.md). Set `NUXT_PUBLIC_API_BASE` to the
+Django backend URL. The static `generate` output only works if the
+host reverse-proxies `/api/*` to the backend — without it the boot
+sequence halts on the boot-error screen.
 
 ## Project structure
 
@@ -61,10 +64,15 @@ roughly, so moving to a real resume parser later wouldn't hurt.
 
 ## The API
 
-The same data is also served as JSON when the site runs as a server:
+The content comes from one place only: the Django REST backend
+(`NUXT_PUBLIC_API_BASE`, default `http://127.0.0.1:8000/v0`). The
+Nuxt server routes below proxy and reshape it for the UI — there is
+no bundled-JSON fallback, so if the backend is down the site shows
+its boot-error screen:
 
 ```
 GET /api/data           # everything in one response
+GET /api/health         # backend reachability + record counts
 GET /api/projects       # optional ?q= filters by title / tech / description
 GET /api/experiences
 GET /api/skills
@@ -72,13 +80,11 @@ GET /api/certifications
 GET /api/about
 ```
 
-Why both the API and a bundled JSON? GitHub Pages is static hosting —
-no server, so `/api` can't work there. The site therefore ships with
-`data.json` bundled into the JS and reads that directly. The API
-exists for when it runs as a real server (local dev, or if it ever
-moves to a VPS). `services/portfolio.js` knows how to talk to the API
-and falls back to the bundled copy, so both paths return the same
-shapes.
+Point `NUXT_PUBLIC_API_BASE` at the deployed backend (e.g.
+`https://api.example.com/v0`) and allow the site origin in the
+backend's `CORS_ALLOWED_ORIGINS`. `public/data.json` now only seeds
+the backend (via `import_portfolio_data`) and the build-time SEO
+meta in `app.vue`.
 
 ## Terminal commands
 

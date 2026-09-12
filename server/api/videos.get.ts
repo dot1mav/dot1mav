@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { getProjectVideos } from '../utils/site-data'
 
-export default defineEventHandler(() => {
+export default defineEventHandler(async () => {
   let manifest = []
   try {
     const raw = readFileSync(join(process.cwd(), 'public', 'videos', 'manifest.json'), 'utf8')
@@ -16,5 +16,5 @@ export default defineEventHandler(() => {
     // No manifest file or not readable — project videos alone still work.
   }
 
-  return [...manifest, ...getProjectVideos()]
+  return [...manifest, ...(await getProjectVideos())]
 })

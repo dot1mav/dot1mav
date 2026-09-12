@@ -68,6 +68,8 @@ class SiteProfile(SoftDeleteModel):
     )
     email = models.EmailField(verbose_name=_("Email"))
     phone = models.CharField(max_length=20, verbose_name=_("Phone"))
+    location = models.CharField(max_length=255, blank=True, default="", verbose_name=_("Location"))
+    website = models.URLField(blank=True, null=True, verbose_name=_("Website"))
     github = models.URLField(blank=True, null=True, verbose_name=_("GitHub"))
     linkedin = models.URLField(blank=True, null=True, verbose_name=_("LinkedIn"))
     telegram = models.CharField(
@@ -92,6 +94,8 @@ class Project(SoftDeleteModel):
     image = models.ImageField(upload_to="projects/", verbose_name=_("Image"))
     demo_url = models.URLField(blank=True, null=True, verbose_name=_("Demo URL"))
     source_url = models.URLField(blank=True, null=True, verbose_name=_("Source URL"))
+    images = models.JSONField(default=list, blank=True, verbose_name=_("Gallery Images"))
+    video = models.URLField(blank=True, null=True, verbose_name=_("Video URL"))
 
     # New Fields
     start_date = models.DateField(blank=True, null=True, verbose_name=_("Start Date"))

@@ -8,3 +8,18 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Secrets & local config
+.env
+
+# Editor
+.idea/
+
+# Local database & uploads
+db.sqlite3
+media/
+staticfiles/
+
+# Archives
+*.zip
+

@@ -1,14 +1,20 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import include, path
 
 admin.site.site_header = "پنل مدیریت پورتفولیو dot1mav"
 admin.site.site_title = "مدیریت dot1mav"
 admin.site.index_title = "به پنل مدیریت خوش آمدید، امین"
 
+def api_root(request):
+    return JsonResponse({"name": "dot1mav portfolio API", "status": "ok"})
+
+
 urlpatterns = [
-    path("4Dm!N/", admin.site.urls),
+    path("", api_root, name="api-root"),
+    path(settings.ADMIN_URL, admin.site.urls),
     path("v0/", include("api.urls")),
 ]
 

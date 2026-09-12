@@ -38,7 +38,10 @@ def _comma_split_env(varname, default=None):
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-a4)i%1po@q@nio@&3yd511@6277c&j5l6ah9s$=ze-647#@(kf"
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "change-this-secret-key-in-production-9f4c8f6b1e2d7a3c5b8e0f1a6d4c9b2e",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG_TAG = os.getenv("DEBUG", 0)
@@ -74,6 +77,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -143,10 +147,13 @@ elif DB_ENGINE == "mariadb" or DB_ENGINE == "mysql":
         }
     }
 else:
+    sqlite_name = os.getenv("SQLITE_NAME", str(BASE_DIR / "db.sqlite3"))
+    if not os.path.isabs(sqlite_name):
+        sqlite_name = str(BASE_DIR / sqlite_name)
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "NAME": sqlite_name,
         }
     }
 
@@ -186,6 +193,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+}
+WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -198,7 +211,24 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {"anon": "60/minute", "user": "120/minute"},
 }
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = os.getenv("SECURE_REFERRER_POLICY", "same-origin")
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "0").lower() in {"1", "true", "yes"}
+SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "0" if DEBUG else "31536000"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+X_FRAME_OPTIONS = "DENY"
+ADMIN_URL = os.getenv("ADMIN_URL", "4Dm!N/")
 
 JALALI_SETTINGS = {
     # JavaScript static files for the admin Jalali date widget

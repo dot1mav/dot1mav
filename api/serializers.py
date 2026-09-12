@@ -13,6 +13,7 @@ from .models import (
 class SiteProfileSerializer(serializers.ModelSerializer):
     avatar_url = serializers.SerializerMethodField()
     resume_url = serializers.SerializerMethodField()
+    resume_fa_url = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
     job_title = serializers.SerializerMethodField()
     bio_short = serializers.SerializerMethodField()
@@ -21,6 +22,7 @@ class SiteProfileSerializer(serializers.ModelSerializer):
     website_url = serializers.SerializerMethodField()
     github_url = serializers.SerializerMethodField()
     linkedin_url = serializers.SerializerMethodField()
+    telegram_url = serializers.SerializerMethodField()
 
     class Meta:
         model = SiteProfile
@@ -35,10 +37,12 @@ class SiteProfileSerializer(serializers.ModelSerializer):
             "website_url",
             "github_url",
             "linkedin_url",
+            "telegram_url",
             "telegram",
             "instagram",
             "avatar_url",
             "resume_url",
+            "resume_fa_url",
             "meta_title",
             "meta_description",
         ]
@@ -58,16 +62,19 @@ class SiteProfileSerializer(serializers.ModelSerializer):
         return obj.bio or ""
 
     def get_location(self, obj):
-        return ""
+        return obj.location or ""
 
     def get_website_url(self, obj):
-        return None
+        return obj.website
 
     def get_github_url(self, obj):
         return obj.github
 
     def get_linkedin_url(self, obj):
         return obj.linkedin
+
+    def get_telegram_url(self, obj):
+        return obj.telegram
 
     def get_absolute_file_url(self, obj, field_name):
         file_field = getattr(obj, field_name, None)
@@ -82,6 +89,13 @@ class SiteProfileSerializer(serializers.ModelSerializer):
         return self.get_absolute_file_url(obj, "avatar")
 
     def get_resume_url(self, obj):
+        # The site is English-first: prefer the English resume and fall
+        # back to the Persian one.
+        return self.get_absolute_file_url(obj, "resume_en") or self.get_absolute_file_url(
+            obj, "resume"
+        )
+
+    def get_resume_fa_url(self, obj):
         return self.get_absolute_file_url(obj, "resume")
 
 
@@ -109,10 +123,13 @@ class ProjectSerializer(serializers.ModelSerializer):
             "source_link",
             "date",
             "is_featured",
+            "images",
+            "video",
         ]
 
     def get_slug(self, obj):
-        return obj.title.lower().replace(" ", "-").replace("/", "-")
+        import re
+        return re.sub(r"[^a-z0-9]+", "-", obj.title.lower()).strip("-")
 
     def get_description_short(self, obj):
         text = obj.description or ""
@@ -217,4 +234,12 @@ class ContactSubmissionSerializer(serializers.ModelSerializer):
     def validate_message(self, value):
         if len(value) < 10:
             raise serializers.ValidationError("Message must be at least 10 characters.")
+        if len(value) > 5000:
+            raise serializers.ValidationError("Message must be at most 5000 characters.")
+        return value
+
+    def validate_name(self, value):
+        value = value.strip()
+        if len(value) < 2:
+            raise serializers.ValidationError("Name must be at least 2 characters.")
         return value

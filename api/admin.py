@@ -11,6 +11,21 @@ from .models import (
     ContactSubmission,
 )
 
+
+def activate_records(modeladmin, request, queryset):
+    queryset.update(is_active=True, is_deleted=False)
+activate_records.short_description = "Activate selected records"
+
+
+def soft_delete_records(modeladmin, request, queryset):
+    queryset.update(is_active=False, is_deleted=True)
+soft_delete_records.short_description = "Soft-delete selected records"
+
+
+def restore_records(modeladmin, request, queryset):
+    queryset.update(is_active=True, is_deleted=False)
+restore_records.short_description = "Restore selected records"
+
 # ==============================================================================
 # BASE CONFIG & MIXINS
 # ==============================================================================
@@ -34,6 +49,7 @@ class CustomAdminStyleMixin:
 
 @admin.register(SiteProfile)
 class SiteProfileAdmin(CustomAdminStyleMixin, admin.ModelAdmin):
+    actions = [activate_records, soft_delete_records, restore_records]
     list_display = (
         "full_name",
         "title",
@@ -108,6 +124,7 @@ class SiteProfileAdmin(CustomAdminStyleMixin, admin.ModelAdmin):
 
 @admin.register(Project)
 class ProjectAdmin(CustomAdminStyleMixin, admin.ModelAdmin):
+    actions = [activate_records, soft_delete_records, restore_records]
     list_display = (
         "title",
         "image_preview",
@@ -211,6 +228,7 @@ class SkillInline(admin.TabularInline):
 
 @admin.register(SkillCategory)
 class SkillCategoryAdmin(CustomAdminStyleMixin, admin.ModelAdmin):
+    actions = [activate_records, soft_delete_records, restore_records]
     list_display = ("name", "order", "is_active")
     list_editable = ("order", "is_active")
     inlines = [SkillInline]
@@ -218,6 +236,7 @@ class SkillCategoryAdmin(CustomAdminStyleMixin, admin.ModelAdmin):
 
 @admin.register(Skill)
 class SkillAdmin(CustomAdminStyleMixin, admin.ModelAdmin):
+    actions = ["activate_skills", "deactivate_skills"]
     list_display = ("name", "category", "level_bar", "is_active")
     list_filter = ("category", "is_active")
 
@@ -229,6 +248,14 @@ class SkillAdmin(CustomAdminStyleMixin, admin.ModelAdmin):
             obj.level,
         )
 
+    @admin.action(description="Activate selected skills")
+    def activate_skills(self, request, queryset):
+        queryset.update(is_active=True)
+
+    @admin.action(description="Deactivate selected skills")
+    def deactivate_skills(self, request, queryset):
+        queryset.update(is_active=False)
+
     level_bar.short_description = "Proficiency"
 
 
@@ -239,6 +266,7 @@ class SkillAdmin(CustomAdminStyleMixin, admin.ModelAdmin):
 
 @admin.register(Experience)
 class ExperienceAdmin(CustomAdminStyleMixin, admin.ModelAdmin):
+    actions = [activate_records, soft_delete_records, restore_records]
     list_display = ("title", "company", "period_display", "status_badge", "is_active")
     list_filter = ("is_active", "is_current")
     search_fields = ("title", "company", "description")
@@ -276,6 +304,7 @@ class ExperienceAdmin(CustomAdminStyleMixin, admin.ModelAdmin):
 
 @admin.register(Certificate)
 class CertificateAdmin(CustomAdminStyleMixin, admin.ModelAdmin):
+    actions = [activate_records, soft_delete_records, restore_records]
     list_display = ("title", "issuer", "issue_date", "is_active")
 
 
@@ -284,6 +313,15 @@ class ContactSubmissionAdmin(CustomAdminStyleMixin, admin.ModelAdmin):
     list_display = ("name", "email", "subject", "is_read", "created_at")
     readonly_fields = ("name", "email", "subject", "message", "created_at")
     list_filter = ("is_read", "created_at")
+    actions = ["mark_as_read", "mark_as_unread"]
 
     def has_add_permission(self, request):
         return False
+
+    @admin.action(description="Mark selected messages as read")
+    def mark_as_read(self, request, queryset):
+        queryset.update(is_read=True)
+
+    @admin.action(description="Mark selected messages as unread")
+    def mark_as_unread(self, request, queryset):
+        queryset.update(is_read=False)

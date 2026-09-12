@@ -23,45 +23,52 @@ from .serializers import (
 
 class SiteProfileAPIView(APIView):
     """
-    GET /api/profile/
+    GET /v0/profile/
     بازگرداندن اطلاعات سینگلتون پروفایل سایت
     """
 
     def get(self, request):
-        profile = get_object_or_404(SiteProfile, is_active=True)
+        profile = get_object_or_404(SiteProfile.active_objects)
         serializer = SiteProfileSerializer(profile, context={"request": request})
         return Response(serializer.data)
 
 
 class ProjectListAPIView(generics.ListAPIView):
     """
-    GET /api/projects/
+    GET /v0/projects/
     لیست تمام پروژه‌های فعال
     """
 
     serializer_class = ProjectSerializer
-    queryset = Project.objects.filter(is_active=True).order_by("order")
+    queryset = Project.active_objects.all().order_by("order")
 
 
 class ProjectDetailAPIView(generics.RetrieveAPIView):
     """
-    GET /api/projects/<slug>/
+    GET /v0/projects/<slug>/
     جزئیات یک پروژه بر اساس slug
     """
 
     serializer_class = ProjectSerializer
     queryset = Project.objects.filter(is_active=True)
-    lookup_field = "slug"
+    def get_object(self):
+        from django.utils.text import slugify
+        from rest_framework.exceptions import NotFound
+        slug = self.kwargs["slug"]
+        for project in self.get_queryset():
+            if slugify(project.title) == slug:
+                return project
+        raise NotFound("Project not found.")
 
 
 class SkillListAPIView(generics.ListAPIView):
     """
-    GET /api/skills/
+    GET /v0/skills/
     لیست دسته‌بندی مهارت‌ها با مهارت‌های فعال داخل هر دسته
     """
 
     serializer_class = SkillCategorySerializer
-    queryset = SkillCategory.objects.filter(is_active=True).order_by("order")
+    queryset = SkillCategory.active_objects.all().order_by("order")
 
     def get_queryset(self):
         # برای بهینه‌سازی پرس‌وجو
@@ -74,7 +81,7 @@ class ExperienceListAPIView(generics.ListAPIView):
     """
 
     serializer_class = ExperienceSerializer
-    queryset = Experience.objects.filter(is_active=True)
+    queryset = Experience.active_objects.all()
 
 
 class CertificateListAPIView(generics.ListAPIView):
@@ -83,12 +90,12 @@ class CertificateListAPIView(generics.ListAPIView):
     """
 
     serializer_class = CertificateSerializer
-    queryset = Certificate.objects.filter(is_active=True)
+    queryset = Certificate.active_objects.all()
 
 
 class ContactSubmissionAPIView(APIView):
     """
-    POST /api/contact/
+    POST /v0/contact/
     ارسال پیام تماس
     """
 

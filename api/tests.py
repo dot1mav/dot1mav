@@ -1,4 +1,5 @@
 from datetime import date
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -45,7 +46,9 @@ class EndpointTests(TestCase):
 
 class SecurityTests(TestCase):
     def test_security_headers_and_admin_authentication(self):
-        response = self.client.get("/4Dm!N/")
+        # Always resolved from settings so the test follows whatever
+        # ADMIN_URL the environment sets.
+        response = self.client.get(f"/{settings.ADMIN_URL}")
         self.assertIn(response.status_code, (301, 302))
         self.assertIn("X-Content-Type-Options", response.headers)
         self.assertEqual(response.headers.get("X-Frame-Options"), "DENY")
@@ -54,4 +57,4 @@ class SecurityTests(TestCase):
         User = get_user_model()
         User.objects.create_user(username="normal", password="Strong-password-123")
         self.client.login(username="normal", password="Strong-password-123")
-        self.assertEqual(self.client.get("/4Dm!N/").status_code, 302)
+        self.assertEqual(self.client.get(f"/{settings.ADMIN_URL}").status_code, 302)

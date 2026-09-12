@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -228,7 +229,13 @@ SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "0" if DEBUG else "31
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
 X_FRAME_OPTIONS = "DENY"
-ADMIN_URL = os.getenv("ADMIN_URL", "4Dm!N/")
+# Admin site path, fully controlled by the ADMIN_URL env var. Normalized so
+# values like "secret-path" or "/secret-path/" both work: the admin URLs are
+# mounted exactly at this path.
+ADMIN_URL = os.getenv("ADMIN_URL", "4Dm!N/").strip().strip("/")
+if not ADMIN_URL:
+    raise ImproperlyConfigured("ADMIN_URL is set but empty — provide a path like 'control-panel/'.")
+ADMIN_URL += "/"
 
 JALALI_SETTINGS = {
     # JavaScript static files for the admin Jalali date widget

@@ -48,6 +48,9 @@ build/
 node_modules/
 jspm_packages/
 
+# bun lockfile is not the source of truth here — npm/package-lock.json is
+bun.lock
+
 # Optional files
 *.backup
 *.bak
